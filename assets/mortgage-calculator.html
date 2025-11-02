@@ -61,6 +61,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        padding: 12px 20px;
       }
 
       .section-summary::after {
@@ -102,7 +103,7 @@
       }
 
       details.section-block > summary {
-        padding: 20px;
+        padding: 0;
       }
 
       details.section-block > .collapsible-content {
@@ -194,22 +195,26 @@
       }
 
       .result-carousel {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        align-items: stretch;
-        gap: 16px;
+        position: relative;
+        padding: 0 12px;
       }
 
       .carousel-nav {
-        width: 36px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
         border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.24);
-        background: rgba(10, 16, 28, 0.65);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(12, 18, 32, 0.88);
         color: rgba(226, 232, 240, 0.72);
         display: grid;
         place-items: center;
         cursor: pointer;
-        transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.45);
+        transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+        z-index: 5;
       }
 
       .carousel-nav[disabled] {
@@ -219,15 +224,25 @@
 
       .carousel-nav:not([disabled]):hover,
       .carousel-nav:not([disabled]):focus-visible {
-        background: rgba(30, 64, 175, 0.35);
-        border-color: rgba(56, 189, 248, 0.45);
-        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.22);
+        border-color: rgba(56, 189, 248, 0.55);
+        color: #bae6fd;
         outline: none;
+        transform: translateY(-50%) scale(1.04);
+      }
+
+      #cardPrev {
+        left: 16px;
+      }
+
+      #cardNext {
+        right: 16px;
       }
 
       .carousel-window {
         overflow: hidden;
         border-radius: 18px;
+        width: 100%;
       }
 
       .carousel-track {
@@ -245,8 +260,14 @@
 
       .slide-content {
         width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
         display: grid;
         gap: 24px;
+      }
+
+      .slide-content.tight {
+        gap: 20px;
       }
 
       .slide-header h2 {
@@ -260,6 +281,17 @@
         margin: 8px 0 0;
         color: rgba(226, 232, 240, 0.65);
         font-size: 14px;
+      }
+
+      .totals-list {
+        display: grid;
+        gap: 10px;
+        font-size: 14px;
+        color: rgba(226, 232, 240, 0.75);
+      }
+
+      .totals-list strong {
+        color: #f9fafb;
       }
 
       .result-card {
@@ -594,20 +626,20 @@
               </div>
             </div>
             <div class="carousel-slide" data-card="amortization">
-              <div class="slide-content">
+              <div class="slide-content tight">
                 <header class="slide-header">
                   <h2>Amortization & totals</h2>
-                  <p>Dig into the lifetime cost breakdown and the first year of the schedule.</p>
+                  <p>Review lifetime costs and the first year of payments at a glance.</p>
                 </header>
-                <details class="section-block" open>
-                  <summary>Lifetime totals</summary>
-                  <div id="totalsBreakdown" style="margin-top: 14px; font-size: 13px; line-height: 1.8;"></div>
-                </details>
-                <details class="section-block" open>
-                  <summary>Schedule preview</summary>
+                <section class="section-block">
+                  <div class="section-title">Lifetime totals</div>
+                  <div class="totals-list" id="totalsBreakdown"></div>
+                </section>
+                <section class="section-block">
+                  <div class="section-title">Schedule preview</div>
                   <div id="schedulePreview"></div>
                   <div class="schedule-note" id="scheduleNote"></div>
-                </details>
+                </section>
               </div>
             </div>
           </div>
