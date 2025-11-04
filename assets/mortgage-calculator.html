@@ -14,20 +14,20 @@
         padding: 16px;
         display: flex;
         justify-content: center;
-        background: radial-gradient(circle at top, #0f172a, #050509 70%);
-        color: #f9fafb;
+        background: radial-gradient(circle at top, #1e2139, #151724 70%);
+        color: #e2e8f0;
       }
 
       .app {
         width: min(720px, 100%);
-        background: rgba(15, 21, 34, 0.96);
-        border: 1px solid rgba(148, 163, 184, 0.16);
+        background: rgba(26, 29, 46, 0.96);
+        border: 1px solid rgba(100, 116, 139, 0.2);
         border-radius: 14px;
         padding: 18px;
-        box-shadow: 0 14px 38px rgba(5, 9, 18, 0.5);
+        box-shadow: 0 14px 42px rgba(10, 13, 28, 0.6);
         backdrop-filter: blur(10px);
         display: grid;
-        gap: 16px;
+        gap: 14px;
       }
 
       header h1 {
@@ -81,16 +81,24 @@
 
       .section-summary:hover::after,
       .section-summary:focus-visible::after {
-        border-color: #38bdf8;
+        border-color: #0ea5e9;
       }
 
       .collapsible-content {
-        padding: 14px;
+        padding: 14px 16px;
         margin-top: 0;
       }
 
       .collapsible-content .grid + .grid {
         margin-top: 12px;
+      }
+
+      .field-group {
+        padding: 10px 0;
+      }
+
+      .field-group + .field-group {
+        border-top: 1px solid rgba(148, 163, 184, 0.12);
       }
 
       .field-group-label {
@@ -99,17 +107,13 @@
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: rgba(226, 232, 240, 0.52);
-        margin: 10px 0 4px;
-      }
-
-      .collapsible-content .field-group-label:first-of-type {
-        margin-top: 0;
+        margin: 0 0 6px;
       }
 
       .section-block {
         border-radius: 12px;
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        background: rgba(9, 14, 24, 0.58);
+        border: 1px solid rgba(100, 116, 139, 0.25);
+        background: rgba(37, 40, 65, 0.7);
         padding: 14px;
         display: grid;
         gap: 10px;
@@ -135,6 +139,11 @@
         display: grid;
         gap: 14px;
         grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      }
+
+      .grid.duo-columns {
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 12px 16px;
       }
 
       .is-hidden {
@@ -186,10 +195,10 @@
       input[type="text"],
       select {
         border: none;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.32);
+        border-bottom: 1px solid rgba(100, 116, 139, 0.4);
         border-radius: 0;
         background: transparent;
-        color: #f9fafb;
+        color: #e2e8f0;
         font-size: 15px;
         padding: 6px 4px;
         transition: border-color 0.2s ease, color 0.2s ease;
@@ -207,8 +216,8 @@
       input:focus,
       select:focus {
         outline: none;
-        border-bottom-color: #38bdf8;
-        color: #f9fafb;
+        border-bottom-color: #0ea5e9;
+        color: #f1f5f9;
       }
 
       .checkbox-row {
@@ -223,34 +232,34 @@
 
       .result-stack {
         display: grid;
-        gap: 12px;
+        gap: 10px;
       }
 
       .quick-metrics {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 8px 12px;
       }
 
       .result-carousel {
         position: relative;
-        padding: 0 12px;
+        padding: 0 28px;
       }
 
       .carousel-nav {
         position: absolute;
-        top: 50%;
+        top: calc(50% + 12px);
         transform: translateY(-50%);
-        width: 44px;
-        height: 44px;
+        width: 42px;
+        height: 42px;
         border-radius: 999px;
-        border: 1px solid rgba(148, 163, 184, 0.35);
-        background: rgba(12, 18, 32, 0.88);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: rgba(10, 15, 26, 0.92);
         color: rgba(226, 232, 240, 0.72);
         display: grid;
         place-items: center;
         cursor: pointer;
-        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.45);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.42);
         transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.2s ease;
         z-index: 5;
       }
@@ -262,29 +271,36 @@
 
       .carousel-nav:not([disabled]):hover,
       .carousel-nav:not([disabled]):focus-visible {
-        background: rgba(56, 189, 248, 0.22);
-        border-color: rgba(56, 189, 248, 0.55);
-        color: #bae6fd;
-        outline: none;
-        transform: translateY(-50%) scale(1.04);
-      }
+        background: rgba(14, 165, 233, 0.25);
+        border-color: #0ea5e9;
+        color: #0ea5e9;
+        box-shadow: 0 8px 28px rgba(14, 165, 233, 0.3);
 
-      #cardPrev {
-        left: 16px;
-      }
+.carousel-slide {
+  min-width: 100%;
+  padding: 4px 0;
+  display: flex;
+  justify-content: center;
+}
 
-      #cardNext {
-        right: 16px;
-      }
+.slide-content {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
 
-      .carousel-window {
-        overflow: hidden;
-        border-radius: 18px;
-        width: 100%;
-      }
+.slide-content.tight {
+  gap: 14px;
+}
 
-      .carousel-track {
-        display: flex;
+.slide-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
         width: 100%;
         transition: transform 0.35s ease-in-out;
       }
@@ -301,11 +317,11 @@
         max-width: 760px;
         margin: 0 auto;
         display: grid;
-        gap: 18px;
+        gap: 14px;
       }
 
       .slide-content.tight {
-        gap: 16px;
+        gap: 14px;
       }
 
       .slide-header h2 {
@@ -316,9 +332,9 @@
       }
 
       .slide-header p {
-        margin: 8px 0 0;
-        color: rgba(226, 232, 240, 0.65);
-        font-size: 14px;
+        margin: 4px 0 0;
+        color: rgba(226, 232, 240, 0.62);
+        font-size: 13px;
       }
 
       .totals-list {
@@ -374,22 +390,44 @@
       }
 
       .result-card.primary {
-        padding: 18px;
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(15, 22, 38, 0.9));
-        border: 1px solid rgba(59, 130, 246, 0.35);
-        box-shadow: 0 18px 38px rgba(30, 64, 175, 0.28);
+        padding: 20px 18px;
+        background: linear-gradient(140deg, rgba(14, 165, 233, 0.22), rgba(26, 29, 46, 0.95));
+        border: 1px solid rgba(14, 165, 233, 0.35);
+        box-shadow: 0 20px 48px rgba(14, 165, 233, 0.25);
+        gap: 10px;
+      }
+
+      .result-card.primary .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
       }
 
       .result-card.primary .label {
-        color: rgba(226, 232, 240, 0.78);
+        color: rgba(226, 232, 240, 0.82);
         font-size: 12px;
         letter-spacing: 0.12em;
       }
 
+      .result-card.primary .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #0ea5e9;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(14, 165, 233, 0.4);
+        background: rgba(14, 165, 233, 0.15);
+      }
+
       .result-card.primary .value {
-        font-size: 42px;
+        font-size: 44px;
         font-weight: 720;
-        line-height: 1.08;
+        line-height: 1.05;
       }
 
       .result-card.secondary {
@@ -418,22 +456,25 @@
       }
 
       .actions button {
-        background: none;
-        border: none;
-        color: inherit;
-        padding: 0;
+        background: rgba(37, 40, 65, 0.8);
+        border: 1px solid rgba(100, 116, 139, 0.35);
+        color: rgba(148, 163, 184, 0.9);
+        padding: 8px 14px;
         font: inherit;
+        font-size: 11px;
         cursor: pointer;
         text-transform: uppercase;
         letter-spacing: 0.1em;
+        border-radius: 8px;
+        transition: all 0.2s ease;
       }
 
-      #calculateBtn {
-        display: none;
-      }
-
-      details summary {
-        cursor: pointer;
+      .actions button:hover,
+      .actions button:focus-visible {
+        color: #0ea5e9;
+        border-color: #0ea5e9;
+        background: rgba(14, 165, 233, 0.15);
+        box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
         outline: none;
       }
 
@@ -550,89 +591,100 @@
                 <details class="section-block collapsible" id="propertyMortgageFees">
                   <summary class="section-summary">Property, mortgage, and fees</summary>
                   <div class="collapsible-content">
-                    <p class="field-group-label">My information</p>
-                    <div class="grid">
-                      <label>
-                        ZIP code
-                        <input type="text" id="zip_code" inputmode="numeric" pattern="\d*" maxlength="9" placeholder="e.g. 94043" />
-                      </label>
-                      <label>
-                        Credit score
-                        <select id="credit_score">
-                          <option value="">Select</option>
-                          <option value="760+">760+</option>
-                          <option value="720-759">720-759</option>
-                          <option value="680-719">680-719</option>
-                          <option value="640-679">640-679</option>
-                          <option value="600-639">600-639</option>
-                          <option value="<600">Below 600</option>
-                        </select>
-                      </label>
+                    <div class="field-group">
+                      <p class="field-group-label">My information</p>
+                      <div class="grid duo-columns">
+                        <label>
+                          ZIP code
+                          <input type="text" id="zip_code" inputmode="numeric" pattern="\d*" maxlength="9" placeholder="e.g. 94043" />
+                        </label>
+                        <label>
+                          Credit score
+                          <select id="credit_score">
+                            <option value="">Select</option>
+                            <option value="760+">760+</option>
+                            <option value="720-759">720-759</option>
+                            <option value="680-719">680-719</option>
+                            <option value="640-679">640-679</option>
+                            <option value="600-639">600-639</option>
+                            <option value="<600">Below 600</option>
+                          </select>
+                        </label>
+                      </div>
                     </div>
 
-                    <p class="field-group-label">Property information</p>
-                    <div class="grid">
-                      <label class="percent-field">
-                        Property tax (% of value)
-                        <input type="number" id="property_tax_input" min="0" step="0.01" />
-                      </label>
-                      <label>
-                        Homeowners insurance ($/yr)
-                        <input type="number" id="homeowners_insurance_yearly" min="0" step="50" />
-                      </label>
-                      <label>
-                        HOA dues ($/mo)
-                        <input type="number" id="hoa_monthly" min="0" step="10" />
-                      </label>
+                    <div class="field-group">
+                      <p class="field-group-label">Property information</p>
+                      <div class="grid duo-columns">
+                        <label class="percent-field">
+                          Property tax (% of value)
+                          <input type="number" id="property_tax_input" min="0" step="0.01" />
+                        </label>
+                        <label>
+                          Homeowners insurance ($/yr)
+                          <input type="number" id="homeowners_insurance_yearly" min="0" step="50" />
+                        </label>
+                        <label>
+                          HOA dues ($/mo)
+                          <input type="number" id="hoa_monthly" min="0" step="10" />
+                        </label>
+                      </div>
                     </div>
 
-                    <p class="field-group-label">Mortgage insurance & fees</p>
-                    <div class="grid">
-                      <label class="percent-field">
-                        PMI (% annual, conventional)
-                        <input type="number" id="pmi_pct" min="0" step="0.01" />
-                      </label>
-                      <label class="percent-field" data-mi-only>
-                        Annual MI fee (% of balance)
-                        <input type="number" id="annual_mi_pct" min="0" step="0.01" />
-                      </label>
-                      <label class="percent-field">
-                        Upfront fee (% base loan)
-                        <input type="number" id="upfront_fee_pct" min="0" step="0.01" />
-                        <div class="checkbox-row" style="margin-top: 8px;">
-                          <input type="checkbox" id="finance_upfront_fee" />
-                          <span style="font-size: 12px; color: rgba(226, 232, 240, 0.72);">Add fee to principal balance</span>
-                        </div>
-                      </label>
+                    <div class="field-group">
+                      <p class="field-group-label">Mortgage insurance & fees</p>
+                      <div class="grid duo-columns">
+                        <label class="percent-field">
+                          PMI (% annual, conventional)
+                          <input type="number" id="pmi_pct" min="0" step="0.01" />
+                        </label>
+                        <label class="percent-field" data-mi-only>
+                          Annual MI fee (% of balance)
+                          <input type="number" id="annual_mi_pct" min="0" step="0.01" />
+                        </label>
+                        <label class="percent-field">
+                          Upfront fee (% base loan)
+                          <input type="number" id="upfront_fee_pct" min="0" step="0.01" />
+                          <div class="checkbox-row" style="margin-top: 8px;">
+                            <input type="checkbox" id="finance_upfront_fee" />
+                            <span style="font-size: 12px; color: rgba(226, 232, 240, 0.72);">Add fee to principal balance</span>
+                          </div>
+                        </label>
+                      </div>
                     </div>
 
-                    <p class="field-group-label">Advanced options</p>
-                    <div class="grid">
-                      <label>
-                        First payment month
-                        <input type="number" id="start_month" min="1" max="12" step="1" />
-                        <span class="field-message" data-field-error="start_month"></span>
-                      </label>
-                      <label>
-                        First payment year
-                        <input type="number" id="start_year" min="2024" step="1" />
-                        <span class="field-message" data-field-error="start_year"></span>
-                      </label>
-                      <label>
-                        Extra payment ($/mo)
-                        <input type="number" id="extra_principal_monthly" min="0" step="50" />
-                      </label>
-                      <label>
-                        Extra starts at month index
-                        <input type="number" id="extra_start_month_index" min="0" step="1" />
-                      </label>
+                    <div class="field-group">
+                      <p class="field-group-label">Advanced options</p>
+                      <div class="grid duo-columns">
+                        <label>
+                          First payment month
+                          <input type="number" id="start_month" min="1" max="12" step="1" />
+                          <span class="field-message" data-field-error="start_month"></span>
+                        </label>
+                        <label>
+                          First payment year
+                          <input type="number" id="start_year" min="2024" step="1" />
+                          <span class="field-message" data-field-error="start_year"></span>
+                        </label>
+                        <label>
+                          Extra payment ($/mo)
+                          <input type="number" id="extra_principal_monthly" min="0" step="50" />
+                        </label>
+                        <label>
+                          Extra starts at month index
+                          <input type="number" id="extra_start_month_index" min="0" step="1" />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </details>
 
                 <div class="result-stack">
                   <div class="result-card primary" id="monthlyPaymentCard">
-                    <span class="label">Monthly payment (month 0)</span>
+                    <div class="card-header">
+                      <span class="label">Monthly payment (month 0)</span>
+                      <span class="badge">All-in payment</span>
+                    </div>
                     <span class="value" id="total_monthly_0">$0</span>
                     <span class="hint">Includes P&I, MI, taxes, insurance, HOA (excludes extra principal).</span>
                   </div>
