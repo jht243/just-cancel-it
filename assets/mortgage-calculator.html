@@ -2272,9 +2272,30 @@
           window.addEventListener('resize', centerNotifyUnderRate);
         }
 
+        // Load daily rate (FRED + 0.5%) and update badge
+        const refreshRateBadge = async () => {
+          try {
+            const resp = await fetch('/api/rate');
+            if (!resp.ok) return;
+            const data = await resp.json();
+            const val = Number(data?.ratePercent);
+            if (!Number.isFinite(val)) return;
+            const numEl = document.querySelector('.rate-badge .rate-num');
+            if (numEl) {
+              numEl.textContent = `${val}%`;
+              requestAnimationFrame(() => {
+                if (typeof centerNotifyUnderRate === 'function') centerNotifyUnderRate();
+              });
+            }
+          } catch (_) {}
+        };
+
         setDefaults(baseDefaults);
         mergeProgramDefaults();
         calculateAndRender();
+
+        // Fetch and display the latest daily rate from server (FRED + 0.5%)
+        refreshRateBadge();
 
         // Component loaded telemetry (Apps SDK guidance)
         emitTelemetry("component_loaded", { slides: carousel.slides.length });
