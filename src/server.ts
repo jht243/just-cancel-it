@@ -1258,6 +1258,20 @@ const httpServer = createServer(
       return;
     }
 
+    // Serve alias for legacy loader path -> our main widget HTML
+    if (req.method === "GET" && url.pathname === "/assets/mortgage-calculator-2d2b.html") {
+      const mainAssetPath = path.join(ASSETS_DIR, "mortgage-calculator.html");
+      if (fs.existsSync(mainAssetPath) && fs.statSync(mainAssetPath).isFile()) {
+        res.writeHead(200, {
+          "Content-Type": "text/html",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-cache",
+        });
+        fs.createReadStream(mainAssetPath).pipe(res);
+        return;
+      }
+    }
+
     // Serve static assets from /assets directory
     if (req.method === "GET" && url.pathname.startsWith("/assets/")) {
       const assetPath = path.join(ASSETS_DIR, url.pathname.slice(8));
@@ -1271,6 +1285,35 @@ const httpServer = createServer(
           "Access-Control-Allow-Origin": "*",
           "Cache-Control": "no-cache"
         });
+
+        // If serving the main widget HTML, inject the current rate into the badge
+        if (ext === ".html" && path.basename(assetPath) === "mortgage-calculator.html") {
+          try {
+            let html = fs.readFileSync(assetPath, "utf8");
+            // Compute the current rate (prefer cache, otherwise fetch)
+            let displayRate: number | null = null;
+            if (fredRateCache && fredRateCache.payload && typeof fredRateCache.payload.ratePercent === "number") {
+              displayRate = fredRateCache.payload.ratePercent;
+            } else {
+              const latest = await fetchFredLatestRate();
+              if (latest) {
+                displayRate = Math.round((latest.adjusted) * 10) / 10;
+              }
+            }
+            if (displayRate == null) displayRate = 5.5;
+            const rateText = `${displayRate}%`;
+            // Replace the initial hardcoded 5% without changing structure/widths
+            html = html.replace(
+              /(<span\s+class=\"rate-num\">)([^<]*?)(<\/span>)/,
+              (_m, p1, _p2, p3) => `${p1}${rateText}${p3}`
+            );
+            res.end(html);
+            return;
+          } catch (e) {
+            // Fallback to streaming the file unchanged if anything goes wrong
+          }
+        }
+
         fs.createReadStream(assetPath).pipe(res);
         return;
       }
