@@ -118,7 +118,11 @@ async function handleRate(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Content-Type", "application/json");
 
   if (req.method === "OPTIONS") {
-    res.writeHead(204).end();
+    res.writeHead(204, {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "content-type",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+    }).end();
     return;
   }
 
@@ -302,7 +306,11 @@ function widgetMeta(widget: MortgageWidget, bustCache: boolean = false) {
     ],
     "openai/widgetPrefersBorder": true,
     "openai/widgetCSP": {
-      connect_domains: ["https://api.stlouisfed.org"],
+      connect_domains: [
+        "https://api.stlouisfed.org",
+        "https://mortgage-calculator-open-ai.onrender.com",
+        "http://localhost:8000"
+      ],
       resource_domains: [],
     },
     "openai/widgetDomain": "https://chatgpt.com",
@@ -1302,6 +1310,7 @@ async function updateButtondownSubscriber(email: string, settlementId: string, s
 async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Content-Type", "application/json");
 
   if (req.method === "OPTIONS") {

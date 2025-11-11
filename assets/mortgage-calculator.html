@@ -2433,9 +2433,9 @@
           };
 
           const SUBSCRIBE_ENDPOINTS = [
-            '/api/subscribe',
             'https://mortgage-calculator-open-ai.onrender.com/api/subscribe',
             'http://localhost:8000/api/subscribe',
+            '/api/subscribe',
           ];
 
           const postJson = async (url, payload) => {
@@ -2474,6 +2474,10 @@
                   try { data = raw ? JSON.parse(raw) : {}; } catch (_) { data = {}; }
                   if (resp.ok && (data?.success || data?.id)) break;
                 } catch (_) {
+                  // Network/CORS failure; clear resp so we don't report stale response
+                  resp = null;
+                  raw = '';
+                  data = {};
                   // try next endpoint
                 }
               }
