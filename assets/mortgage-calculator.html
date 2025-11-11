@@ -2482,7 +2482,33 @@
           try { emitTelemetry("rate_fetch_failed", {}); } catch (_) {}
         };
 
-        setDefaults(baseDefaults);
+        // Read parameters from ChatGPT tool call if available
+        const toolOutput = window?.openai?.toolOutput;
+        const providedParams = toolOutput ? {
+          loan_type: toolOutput.loan_type,
+          home_value: toolOutput.home_value,
+          down_payment_value: toolOutput.down_payment_value,
+          rate_apr: toolOutput.rate_apr,
+          term_years: toolOutput.term_years,
+          zip_code: toolOutput.zip_code,
+          credit_score: toolOutput.credit_score,
+          property_tax_input: toolOutput.property_tax_input,
+          homeowners_insurance_yearly: toolOutput.homeowners_insurance_yearly,
+          hoa_monthly: toolOutput.hoa_monthly,
+          pmi_pct: toolOutput.pmi_pct,
+          annual_mi_pct: toolOutput.annual_mi_pct,
+          upfront_fee_pct: toolOutput.upfront_fee_pct,
+          finance_upfront_fee: toolOutput.finance_upfront_fee,
+          start_month: toolOutput.start_month,
+          start_year: toolOutput.start_year,
+          extra_principal_monthly: toolOutput.extra_principal_monthly,
+          extra_start_month_index: toolOutput.extra_start_month_index,
+        } : {};
+        
+        // Merge provided parameters with base defaults
+        const initialDefaults = { ...baseDefaults, ...providedParams };
+        
+        setDefaults(initialDefaults);
         mergeProgramDefaults();
         calculateAndRender();
 

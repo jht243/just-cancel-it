@@ -28,6 +28,8 @@ import {
   type ResourceTemplate,
   type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
+
 type MortgageWidget = {
   id: string;
   title: string;
@@ -299,6 +301,11 @@ function widgetMeta(widget: MortgageWidget, bustCache: boolean = false) {
       "home affordability",
     ],
     "openai/widgetPrefersBorder": true,
+    "openai/widgetCSP": {
+      connect_domains: ["https://api.stlouisfed.org"],
+      resource_domains: [],
+    },
+    "openai/widgetDomain": "https://chatgpt.com",
     "openai/toolInvocation/invoking": widget.invoking,
     "openai/toolInvocation/invoked": widget.invoked,
     "openai/widgetAccessible": true,
@@ -337,18 +344,144 @@ widgets.forEach((widget) => {
 
 const toolInputSchema = {
   type: "object",
-  properties: {},
+  properties: {
+    loan_type: {
+      type: "string",
+      description: "Type of mortgage loan program. Choose 'conventional' for standard loans, 'FHA' for Federal Housing Administration loans (lower down payment, easier qualification), 'VA' for Veterans Affairs loans (military benefits), or 'USDA' for rural development loans.",
+      enum: ["conventional", "FHA", "VA", "USDA"],
+    },
+    home_value: {
+      type: "number",
+      description: "Total purchase price or current value of the home in dollars. Example: 450000 for a $450,000 home.",
+    },
+    down_payment_value: {
+      type: "number",
+      description: "Amount of money paid upfront toward the home purchase in dollars. Example: 90000 for a $90,000 down payment (20% of $450k).",
+    },
+    rate_apr: {
+      type: "number",
+      description: "Annual percentage rate for the mortgage loan. Example: 6.75 for a 6.75% interest rate. Use the current FRED rate if not specified.",
+    },
+    term_years: {
+      type: "number",
+      description: "Length of the mortgage loan in years. Common values are 15 or 30 years. Example: 30 for a 30-year mortgage.",
+    },
+    zip_code: {
+      type: "string",
+      description: "ZIP code of the property location, used for estimating property taxes. Example: '94043' for Mountain View, CA.",
+    },
+    credit_score: {
+      type: "string",
+      description: "Borrower's credit score range, affects interest rate and loan eligibility. Choose from available ranges.",
+      enum: ["760+", "720-759", "680-719", "640-679", "600-639", "<600"],
+    },
+    property_tax_input: {
+      type: "number",
+      description: "Annual property tax as a percentage of the home's assessed value. Example: 1.05 for 1.05% annual property tax.",
+    },
+    homeowners_insurance_yearly: {
+      type: "number",
+      description: "Annual cost of homeowners insurance in dollars. Example: 1500 for $1,500/year.",
+    },
+    hoa_monthly: {
+      type: "number",
+      description: "Monthly homeowners association dues in dollars. Example: 250 for $250/month. Use 0 if no HOA.",
+    },
+    pmi_pct: {
+      type: "number",
+      description: "Private mortgage insurance annual percentage for conventional loans (when down payment < 20%). Example: 0.5 for 0.5% annual PMI.",
+    },
+    annual_mi_pct: {
+      type: "number",
+      description: "Annual mortgage insurance percentage for FHA/USDA loans as percentage of remaining balance. Example: 0.85 for 0.85% annual MI.",
+    },
+    upfront_fee_pct: {
+      type: "number",
+      description: "Upfront mortgage insurance fee as percentage of base loan amount. Example: 1.75 for 1.75% upfront fee (common for FHA).",
+    },
+    finance_upfront_fee: {
+      type: "boolean",
+      description: "Whether to add the upfront fee to the principal balance (true) or pay it separately (false).",
+    },
+    start_month: {
+      type: "number",
+      description: "Month of first mortgage payment (1-12, where 1=January, 12=December). Example: 3 for March.",
+    },
+    start_year: {
+      type: "number",
+      description: "Year of first mortgage payment. Example: 2025.",
+    },
+    extra_principal_monthly: {
+      type: "number",
+      description: "Additional monthly payment toward principal to pay off loan faster. Example: 500 for $500 extra per month.",
+    },
+    extra_start_month_index: {
+      type: "number",
+      description: "Month index when extra principal payments begin (0 = month 1). Example: 0 to start immediately, 12 to start after one year.",
+    },
+  },
   required: [],
   additionalProperties: false,
 } as const;
+
+const toolInputParser = z.object({
+  loan_type: z.enum(["conventional", "FHA", "VA", "USDA"]).optional(),
+  home_value: z.number().optional(),
+  down_payment_value: z.number().optional(),
+  rate_apr: z.number().optional(),
+  term_years: z.number().optional(),
+  zip_code: z.string().optional(),
+  credit_score: z.enum(["760+", "720-759", "680-719", "640-679", "600-639", "<600"]).optional(),
+  property_tax_input: z.number().optional(),
+  homeowners_insurance_yearly: z.number().optional(),
+  hoa_monthly: z.number().optional(),
+  pmi_pct: z.number().optional(),
+  annual_mi_pct: z.number().optional(),
+  upfront_fee_pct: z.number().optional(),
+  finance_upfront_fee: z.boolean().optional(),
+  start_month: z.number().min(1).max(12).optional(),
+  start_year: z.number().optional(),
+  extra_principal_monthly: z.number().optional(),
+  extra_start_month_index: z.number().optional(),
+});
 
 const tools: Tool[] = widgets.map((widget) => ({
   name: widget.id,
   description:
     "Use this when you need a full mortgage-planning workspace that pulls live FRED rates, lets you adjust loan assumptions, and visualizes payments via charts and amortization tables. Do not use for unrelated financial products like auto loans or credit cards.",
   inputSchema: toolInputSchema,
+  outputSchema: {
+    type: "object",
+    properties: {
+      ready: { type: "boolean" },
+      timestamp: { type: "string" },
+      currentRate: { type: ["number", "null"] },
+      loan_type: { type: "string" },
+      home_value: { type: "number" },
+      down_payment_value: { type: "number" },
+      rate_apr: { type: "number" },
+      term_years: { type: "number" },
+      zip_code: { type: "string" },
+      credit_score: { type: "string" },
+      property_tax_input: { type: "number" },
+      homeowners_insurance_yearly: { type: "number" },
+      hoa_monthly: { type: "number" },
+      pmi_pct: { type: "number" },
+      annual_mi_pct: { type: "number" },
+      upfront_fee_pct: { type: "number" },
+      finance_upfront_fee: { type: "boolean" },
+      start_month: { type: "number" },
+      start_year: { type: "number" },
+      extra_principal_monthly: { type: "number" },
+      extra_start_month_index: { type: "number" },
+    },
+  },
   title: widget.title,
-  _meta: widgetMeta(widget),
+  securitySchemes: [{ type: "noauth" }],
+  _meta: {
+    ...widgetMeta(widget),
+    securitySchemes: [{ type: "noauth" }],
+  },
   annotations: {
     destructiveHint: false,
     openWorldHint: false,
@@ -484,6 +617,19 @@ function createMortgageCalculatorServer(): Server {
           throw new Error(`Unknown tool: ${request.params.name}`);
         }
 
+        // Parse and validate input parameters
+        let args: z.infer<typeof toolInputParser> = {};
+        try {
+          args = toolInputParser.parse(request.params.arguments ?? {});
+        } catch (parseError: any) {
+          logAnalytics("parameter_parsing_error", {
+            toolName: request.params.name,
+            params: request.params.arguments,
+            error: parseError.message,
+          });
+          throw parseError;
+        }
+
         // Capture user context from _meta - try multiple locations
         const meta = (request as any)._meta || request.params?._meta || {};
         const userLocation = meta["openai/userLocation"];
@@ -497,10 +643,18 @@ function createMortgageCalculatorServer(): Server {
 
         const responseTime = Date.now() - startTime;
 
+        // Infer likely user query from parameters
+        const inferredQuery = [];
+        if (args.home_value) inferredQuery.push(`home value: $${args.home_value.toLocaleString()}`);
+        if (args.down_payment_value) inferredQuery.push(`down payment: $${args.down_payment_value.toLocaleString()}`);
+        if (args.loan_type) inferredQuery.push(`loan type: ${args.loan_type}`);
+        if (args.term_years) inferredQuery.push(`${args.term_years}-year term`);
+        if (args.rate_apr) inferredQuery.push(`${args.rate_apr}% APR`);
+
         logAnalytics("tool_call_success", {
           toolName: request.params.name,
-          params: request.params.arguments ?? {},
-          inferredQuery: "hello world widget",
+          params: args,
+          inferredQuery: inferredQuery.length > 0 ? inferredQuery.join(", ") : "mortgage calculator",
           responseTime,
           device: deviceCategory,
           userLocation: userLocation
@@ -526,7 +680,30 @@ function createMortgageCalculatorServer(): Server {
               text: widget.responseText,
             },
           ],
-          structuredContent: null,
+          structuredContent: {
+            ready: true,
+            timestamp: new Date().toISOString(),
+            currentRate: fredRateCache?.payload?.ratePercent ?? null,
+            // Flatten parsed parameters directly into structuredContent
+            loan_type: args.loan_type,
+            home_value: args.home_value,
+            down_payment_value: args.down_payment_value,
+            rate_apr: args.rate_apr,
+            term_years: args.term_years,
+            zip_code: args.zip_code,
+            credit_score: args.credit_score,
+            property_tax_input: args.property_tax_input,
+            homeowners_insurance_yearly: args.homeowners_insurance_yearly,
+            hoa_monthly: args.hoa_monthly,
+            pmi_pct: args.pmi_pct,
+            annual_mi_pct: args.annual_mi_pct,
+            upfront_fee_pct: args.upfront_fee_pct,
+            finance_upfront_fee: args.finance_upfront_fee,
+            start_month: args.start_month,
+            start_year: args.start_year,
+            extra_principal_monthly: args.extra_principal_monthly,
+            extra_start_month_index: args.extra_start_month_index,
+          },
           _meta: widgetMetadata,
         };
       } catch (error: any) {
