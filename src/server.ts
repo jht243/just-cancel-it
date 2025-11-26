@@ -296,7 +296,7 @@ function widgetMeta(widget: BmiHealthWidget, bustCache: boolean = false) {
   return {
     "openai/outputTemplate": templateUri,
     "openai/widgetDescription":
-      "A comprehensive health calculator for BMI, Ideal Weight, Body Fat Percentage, and Daily Calorie Needs. The widget works immediately with default values - no user input required to open it. Users can optionally enter their measurements directly in the widget interface.",
+      "A comprehensive health calculator for BMI, Ideal Weight, Body Fat Percentage, and Calorie Needs.",
     "openai/componentDescriptions": {
       "metrics-form": "Input form for height, weight, age, gender, and other body measurements.",
       "bmi-card": "Card displaying the calculated Body Mass Index and health category.",
@@ -354,7 +354,7 @@ const widgets: BmiHealthWidget[] = [
     invoking:
       "Opening the BMI Health Calculator...",
     invoked:
-      "Here is the BMI Health Calculator. You can use it right away - it has default values pre-filled, or you can enter your own height, weight, age, and other measurements.",
+      "Here is the BMI Health Calculator. You can enter your height and weight.",
     html: readWidgetHtml("bmi-health-calculator"),
   },
 ];
@@ -385,6 +385,7 @@ const toolInputSchema = {
   },
   required: [],
   additionalProperties: false,
+  $schema: "http://json-schema.org/draft-07/schema#",
 } as const;
 
 const toolInputParser = z.object({
@@ -401,7 +402,7 @@ const toolInputParser = z.object({
 const tools: Tool[] = widgets.map((widget) => ({
   name: widget.id,
   description:
-    "Use this for BMI, Ideal Weight, Body Fat, and Calorie analysis. All parameters are optional - the widget works with default values and can be opened immediately. Users can enter their height, weight, age, gender, and other measurements directly in the widget interface.",
+    "Use this for BMI, Ideal Weight, and Body Fat analysis. It calculates health metrics based on height, weight, and other inputs.",
   inputSchema: toolInputSchema,
   outputSchema: {
     type: "object",
