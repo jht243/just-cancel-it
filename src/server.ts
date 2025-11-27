@@ -773,7 +773,6 @@ function createBmiHealthCalculatorServer(): Server {
         } catch {}
 
         return {
-          content: [],
           structuredContent: structured,
           _meta: metaForReturn,
         };
