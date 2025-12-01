@@ -291,8 +291,8 @@ export default function RetirementCalculatorHelloWorld({ initialData }: { initia
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 email,
-                settlementId: "retirement-news",
-                settlementName: "Retirement Calculator News",
+                topicId: "retirement-news",
+                topicName: "Retirement Calculator Updates",
                 turnstileToken
             })
         });
@@ -1685,6 +1685,24 @@ export default function RetirementCalculatorHelloWorld({ initialData }: { initia
                         />
                     </div>
                 </div>
+                
+                <button 
+                    onClick={() => setShowSavingsModal(false)}
+                    style={{
+                        marginTop: 24,
+                        width: "100%",
+                        padding: "14px",
+                        borderRadius: "12px",
+                        border: "none",
+                        backgroundColor: COLORS.primary,
+                        color: "white",
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        cursor: "pointer"
+                    }}
+                >
+                    Save
+                </button>
             </div>
         </div>
       )}
@@ -1747,6 +1765,24 @@ export default function RetirementCalculatorHelloWorld({ initialData }: { initia
                         />
                     </div>
                 </div>
+                
+                <button 
+                    onClick={() => setShowIncomeModal(false)}
+                    style={{
+                        marginTop: 24,
+                        width: "100%",
+                        padding: "14px",
+                        borderRadius: "12px",
+                        border: "none",
+                        backgroundColor: COLORS.primary,
+                        color: "white",
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        cursor: "pointer"
+                    }}
+                >
+                    Save
+                </button>
             </div>
         </div>
       )}

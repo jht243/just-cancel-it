@@ -67,22 +67,6 @@ if (!fs.existsSync(LOGS_DIR)) {
   fs.mkdirSync(LOGS_DIR, { recursive: true });
 }
 
-// FRED daily mortgage rate endpoint logic removed for Retirement Calculator
-type RateCache = { ts: number; payload: any } | null;
-let fredRateCache: RateCache = null;
-
-async function fetchFredLatestRate(): Promise<{ raw: number; adjusted: number; observationDate: string; source: string; } | null> {
-  // FRED integration is disabled/removed for Retirement context
-  return null;
-}
-
-async function handleRate(req: IncomingMessage, res: ServerResponse) {
-  // ...
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Content-Type", "application/json");
-  res.writeHead(200).end(JSON.stringify({ note: "Rate endpoint not used in Retirement calculator" }));
-}
-
 type AnalyticsEvent = {
   timestamp: string;
   event: string;
@@ -526,7 +510,7 @@ function createRetirementCalculatorServer(): Server {
             return Number.isFinite(n) ? Math.round(n) : null;
           };
 
-          // Infer height and weight
+          // Infer age and income from user text
           if (args.current_age === undefined) {
              // Basic regex for age
              const ageMatch = userText.match(/\b(\d{1,3})\s*(?:yo|years|year old)\b/i);
@@ -639,10 +623,9 @@ function createRetirementCalculatorServer(): Server {
         console.log("[MCP] Returning outputTemplate:", (metaForReturn as any)["openai/outputTemplate"]);
         console.log("[MCP] Returning structuredContent:", structured);
 
-        // Log success analytics with rental parameters
+        // Log success analytics
         try {
-          // Check for "empty" result - effectively when no main calculation inputs are provided
-          // This mimics the "filteredSettlements.length === 0" logic from the prior project
+          // Check for "empty" result - when no main calculation inputs are provided
           const hasMainInputs = args.annual_pre_tax_income || args.current_retirement_savings || args.current_age;
           
           if (!hasMainInputs) {
@@ -697,7 +680,6 @@ const subscribePath = "/api/subscribe";
 const analyticsPath = "/analytics";
 const trackEventPath = "/api/track";
 const healthPath = "/health";
-const ratePath = "/api/rate";
 
 const ANALYTICS_PASSWORD = process.env.ANALYTICS_PASSWORD || "changeme123";
 
@@ -719,9 +701,6 @@ function humanizeEventName(event: string): string {
     tool_call_success: "Tool Call Success",
     tool_call_error: "Tool Call Error",
     parameter_parse_error: "Parameter Parse Error",
-    widget_file_claim_click: "File Claim Click",
-    widget_share_click: "Share Click",
-    widget_notify_me_subscribe: "Notify Me Subscribe",
     widget_carousel_prev: "Carousel Previous",
     widget_carousel_next: "Carousel Next",
     widget_filter_age_change: "Filter: Age Change",
@@ -731,9 +710,6 @@ function humanizeEventName(event: string): string {
     widget_user_feedback: "User Feedback",
     widget_test_event: "Test Event",
     widget_followup_click: "Follow-up Click",
-    widget_toggle_biweekly: "Toggle Biweekly",
-    widget_slider_rate_change: "Rate Slider Change",
-    widget_slider_down_payment_change: "Down Payment Slider Change",
   };
   return eventMap[event] || event;
 }
@@ -877,58 +853,67 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
     widgetInteractions[humanName] = (widgetInteractions[humanName] || 0) + 1;
   });
   
-  // Category selections count
-  const categorySelections: Record<string, number> = {};
-  widgetEvents.filter(l => l.event === "widget_filter_category_change").forEach((log) => {
-    if (log.to) {
-      categorySelections[log.to] = (categorySelections[log.to] || 0) + 1;
+  // Age distribution from calculations
+  const ageDistribution: Record<string, number> = {};
+  successLogs.forEach((log) => {
+    if (log.params?.current_age) {
+      const age = log.params.current_age;
+      let bucket = "Unknown";
+      if (age < 30) bucket = "Under 30";
+      else if (age < 40) bucket = "30-39";
+      else if (age < 50) bucket = "40-49";
+      else if (age < 60) bucket = "50-59";
+      else bucket = "60+";
+      ageDistribution[bucket] = (ageDistribution[bucket] || 0) + 1;
     }
   });
-  
-  // Age selections count
-  const ageSelections: Record<string, number> = {};
-  widgetEvents.filter(l => l.event === "widget_filter_age_change").forEach((log) => {
-    if (log.to) {
-      ageSelections[log.to] = (ageSelections[log.to] || 0) + 1;
+
+  // Income distribution from calculations
+  const incomeDistribution: Record<string, number> = {};
+  successLogs.forEach((log) => {
+    if (log.params?.annual_pre_tax_income) {
+      const income = log.params.annual_pre_tax_income;
+      let bucket = "Unknown";
+      if (income < 50000) bucket = "Under $50k";
+      else if (income < 100000) bucket = "$50k-$100k";
+      else if (income < 150000) bucket = "$100k-$150k";
+      else if (income < 200000) bucket = "$150k-$200k";
+      else bucket = "$200k+";
+      incomeDistribution[bucket] = (incomeDistribution[bucket] || 0) + 1;
     }
   });
-  
-  // Sort selections count
-  const sortSelections: Record<string, number> = {};
-  widgetEvents.filter(l => l.event === "widget_filter_sort_change").forEach((log) => {
-    if (log.to) {
-      sortSelections[log.to] = (sortSelections[log.to] || 0) + 1;
+
+  // Retirement age targets
+  const retirementAgeTargets: Record<string, number> = {};
+  successLogs.forEach((log) => {
+    if (log.params?.retirement_age) {
+      const age = log.params.retirement_age;
+      let bucket = "Unknown";
+      if (age < 60) bucket = "Before 60";
+      else if (age < 65) bucket = "60-64";
+      else if (age < 70) bucket = "65-69";
+      else bucket = "70+";
+      retirementAgeTargets[bucket] = (retirementAgeTargets[bucket] || 0) + 1;
     }
   });
-  
-  // Clicks per settlement
-  // const settlementClicks: Record<string, { name: string; count: number }> = {};
-  // widgetEvents.filter(l => l.event === "widget_file_claim_click").forEach((log) => {
-  //   if (log.settlementId) {
-  //     if (!settlementClicks[log.settlementId]) {
-  //       settlementClicks[log.settlementId] = { name: log.settlementName || log.settlementId, count: 0 };
-  //     }
-  //     settlementClicks[log.settlementId].count++;
-  //   }
-  // });
 
   // Calculator Actions
   const actionCounts: Record<string, number> = {
     "Calculate": 0,
     "Subscribe": 0,
-    "Donate": 0, 
-    "Print": 0,
-    "Reset": 0,
-    "Photo Upload": 0
+    "View Graph": 0, 
+    "View Summary": 0,
+    "View Tips": 0,
+    "Advanced Toggle": 0
   };
 
   widgetEvents.forEach(log => {
       if (log.event === "widget_calculate_click") actionCounts["Calculate"]++;
       if (log.event === "widget_notify_me_subscribe") actionCounts["Subscribe"]++;
-      if (log.event === "widget_donate_click") actionCounts["Donate"]++;
-      if (log.event === "widget_print_click") actionCounts["Print"]++;
-      if (log.event === "widget_reset_click") actionCounts["Reset"]++;
-      if (log.event === "widget_photo_upload") actionCounts["Photo Upload"]++;
+      if (log.event === "widget_view_graph") actionCounts["View Graph"]++;
+      if (log.event === "widget_view_summary") actionCounts["View Summary"]++;
+      if (log.event === "widget_view_tips") actionCounts["View Tips"]++;
+      if (log.event === "widget_advanced_toggle") actionCounts["Advanced Toggle"]++;
   });
 
   return `<!DOCTYPE html>
@@ -1084,31 +1069,11 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
 
     <div class="grid" style="margin-bottom: 20px;">
       <div class="card">
-        <h2>Category Selections</h2>
+        <h2>User Age Distribution</h2>
         <table>
-          <thead><tr><th>Category</th><th>Selections</th></tr></thead>
+          <thead><tr><th>Age Range</th><th>Users</th></tr></thead>
           <tbody>
-            ${Object.entries(categorySelections).length > 0 ? Object.entries(categorySelections)
-              .sort((a, b) => b[1] - a[1])
-              .map(
-                ([category, count]) => `
-              <tr>
-                <td>${category}</td>
-                <td>${count}</td>
-              </tr>
-            `
-              )
-              .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="card">
-        <h2>Age Range Selections</h2>
-        <table>
-          <thead><tr><th>Age Range</th><th>Selections</th></tr></thead>
-          <tbody>
-            ${Object.entries(ageSelections).length > 0 ? Object.entries(ageSelections)
+            ${Object.entries(ageDistribution).length > 0 ? Object.entries(ageDistribution)
               .sort((a, b) => b[1] - a[1])
               .map(
                 ([age, count]) => `
@@ -1122,20 +1087,18 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
           </tbody>
         </table>
       </div>
-    </div>
-
-    <div class="grid" style="margin-bottom: 20px;">
+      
       <div class="card">
-        <h2>Sort Selections</h2>
+        <h2>Income Distribution</h2>
         <table>
-          <thead><tr><th>Sort By</th><th>Selections</th></tr></thead>
+          <thead><tr><th>Income Range</th><th>Users</th></tr></thead>
           <tbody>
-            ${Object.entries(sortSelections).length > 0 ? Object.entries(sortSelections)
+            ${Object.entries(incomeDistribution).length > 0 ? Object.entries(incomeDistribution)
               .sort((a, b) => b[1] - a[1])
               .map(
-                ([sort, count]) => `
+                ([income, count]) => `
               <tr>
-                <td>${sort}</td>
+                <td>${income}</td>
                 <td>${count}</td>
               </tr>
             `
@@ -1145,7 +1108,25 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
         </table>
       </div>
       
-      <!-- Replaced File Claim Clicks with empty or other widget data -->
+      <div class="card">
+        <h2>Target Retirement Age</h2>
+        <table>
+          <thead><tr><th>Age Range</th><th>Users</th></tr></thead>
+          <tbody>
+            ${Object.entries(retirementAgeTargets).length > 0 ? Object.entries(retirementAgeTargets)
+              .sort((a, b) => b[1] - a[1])
+              .map(
+                ([age, count]) => `
+              <tr>
+                <td>${age}</td>
+                <td>${count}</td>
+              </tr>
+            `
+              )
+              .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="card" style="margin-bottom: 20px;">
@@ -1314,7 +1295,7 @@ async function verifyTurnstile(token: string): Promise<boolean> {
 }
 
 // Buttondown API integration
-async function subscribeToButtondown(email: string, settlementId: string, settlementName: string, deadline: string | null) {
+async function subscribeToButtondown(email: string, topicId: string, topicName: string) {
   const BUTTONDOWN_API_KEY = process.env.BUTTONDOWN_API_KEY;
   
   if (!BUTTONDOWN_API_KEY) {
@@ -1322,14 +1303,9 @@ async function subscribeToButtondown(email: string, settlementId: string, settle
   }
 
   const metadata: Record<string, any> = {
-    settlementName,
+    topicName,
     subscribedAt: new Date().toISOString(),
   };
-
-  // Only add deadline if it's provided (not null for global notifications)
-  if (deadline) {
-    metadata.deadline = deadline;
-  }
 
   const response = await fetch("https://api.buttondown.email/v1/subscribers", {
     method: "POST",
@@ -1339,7 +1315,7 @@ async function subscribeToButtondown(email: string, settlementId: string, settle
     },
     body: JSON.stringify({
       email_address: email,
-      tags: [settlementId],
+      tags: [topicId],
       metadata,
     }),
   });
@@ -1365,8 +1341,8 @@ async function subscribeToButtondown(email: string, settlementId: string, settle
   return await response.json();
 }
 
-// Update existing subscriber with new settlement
-async function updateButtondownSubscriber(email: string, settlementId: string, settlementName: string, deadline: string | null) {
+// Update existing subscriber with new topic
+async function updateButtondownSubscriber(email: string, topicId: string, topicName: string) {
   const BUTTONDOWN_API_KEY = process.env.BUTTONDOWN_API_KEY;
   
   if (!BUTTONDOWN_API_KEY) {
@@ -1398,20 +1374,19 @@ async function updateButtondownSubscriber(email: string, settlementId: string, s
   const existingTags = subscriber.tags || [];
   const existingMetadata = subscriber.metadata || {};
 
-  // Add new settlement to tags if not already there
-  const updatedTags = existingTags.includes(settlementId) ? existingTags : [...existingTags, settlementId];
+  // Add new topic to tags if not already there
+  const updatedTags = existingTags.includes(topicId) ? existingTags : [...existingTags, topicId];
 
-  // Add new settlement to metadata (Buttondown requires string values)
-  const settlementKey = `settlement_${settlementId}`;
-  const settlementData = JSON.stringify({
-    name: settlementName,
-    deadline: deadline,
+  // Add new topic to metadata (Buttondown requires string values)
+  const topicKey = `topic_${topicId}`;
+  const topicData = JSON.stringify({
+    name: topicName,
     subscribedAt: new Date().toISOString(),
   });
   
   const updatedMetadata = {
     ...existingMetadata,
-    [settlementKey]: settlementData,
+    [topicKey]: topicData,
   };
 
   const updateResponse = await fetch(`https://api.buttondown.email/v1/subscribers/${subscriberId}`, {
@@ -1456,15 +1431,15 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
       body += chunk;
     }
 
-    const { email, settlementId, settlementName, deadline, turnstileToken } = JSON.parse(body);
+    // Support both old (settlementId/settlementName) and new (topicId/topicName) field names
+    const parsed = JSON.parse(body);
+    const email = parsed.email;
+    const topicId = parsed.topicId || parsed.settlementId || "retirement-news";
+    const topicName = parsed.topicName || parsed.settlementName || "Retirement Calculator Updates";
+    const turnstileToken = parsed.turnstileToken;
 
     if (!email || !email.includes("@")) {
       res.writeHead(400).end(JSON.stringify({ error: "Invalid email address" }));
-      return;
-    }
-
-    if (!settlementId || !settlementName) {
-      res.writeHead(400).end(JSON.stringify({ error: "Missing required fields" }));
       return;
     }
 
@@ -1487,10 +1462,10 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
     }
 
     try {
-      await subscribeToButtondown(email, settlementId, settlementName, deadline || null);
+      await subscribeToButtondown(email, topicId, topicName);
       res.writeHead(200).end(JSON.stringify({ 
         success: true, 
-        message: "Successfully subscribed! You'll receive a reminder before the deadline." 
+        message: "Successfully subscribed! You'll receive retirement planning tips and updates." 
       }));
     } catch (subscribeError: any) {
       const rawMessage = String(subscribeError?.message ?? "").trim();
@@ -1498,17 +1473,17 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
       const already = msg.includes('already subscribed') || msg.includes('already exists') || msg.includes('already on your list') || msg.includes('subscriber already exists') || msg.includes('already');
 
       if (already) {
-        console.log("Subscriber already on list, attempting update", { email, settlementId, message: rawMessage });
+        console.log("Subscriber already on list, attempting update", { email, topicId, message: rawMessage });
         try {
-          await updateButtondownSubscriber(email, settlementId, settlementName, deadline || null);
+          await updateButtondownSubscriber(email, topicId, topicName);
           res.writeHead(200).end(JSON.stringify({ 
             success: true, 
-            message: "Settlement added to your subscriptions!" 
+            message: "You're now subscribed to this topic!" 
           }));
         } catch (updateError: any) {
           console.warn("Update subscriber failed, returning graceful success", {
             email,
-            settlementId,
+            topicId,
             error: updateError?.message,
           });
           logAnalytics("widget_notify_me_subscribe_error", {
@@ -1647,11 +1622,6 @@ const httpServer = createServer(
 
     if (url.pathname === subscribePath) {
       await handleSubscribe(req, res);
-      return;
-    }
-
-    if (url.pathname === ratePath) {
-      await handleRate(req, res);
       return;
     }
 

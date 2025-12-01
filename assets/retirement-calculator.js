@@ -48831,8 +48831,8 @@ function RetirementCalculatorHelloWorld({ initialData: initialData2 }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          settlementId: "retirement-news",
-          settlementName: "Retirement Calculator News",
+          topicId: "retirement-news",
+          topicName: "Retirement Calculator Updates",
           turnstileToken
         })
       });
@@ -50176,7 +50176,26 @@ function RetirementCalculatorHelloWorld({ initialData: initialData2 }) {
             }
           )
         ] })
-      ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "button",
+        {
+          onClick: () => setShowSavingsModal(false),
+          style: {
+            marginTop: 24,
+            width: "100%",
+            padding: "14px",
+            borderRadius: "12px",
+            border: "none",
+            backgroundColor: COLORS.primary,
+            color: "white",
+            fontSize: "16px",
+            fontWeight: 700,
+            cursor: "pointer"
+          },
+          children: "Save"
+        }
+      )
     ] }) }),
     showIncomeModal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: styles.modalOverlay, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: styles.modalContent, children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { style: styles.modalClose, onClick: () => setShowIncomeModal(false), children: "\u2715" }),
@@ -50248,7 +50267,26 @@ function RetirementCalculatorHelloWorld({ initialData: initialData2 }) {
             }
           )
         ] })
-      ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+        "button",
+        {
+          onClick: () => setShowIncomeModal(false),
+          style: {
+            marginTop: 24,
+            width: "100%",
+            padding: "14px",
+            borderRadius: "12px",
+            border: "none",
+            backgroundColor: COLORS.primary,
+            color: "white",
+            fontSize: "16px",
+            fontWeight: 700,
+            cursor: "pointer"
+          },
+          children: "Save"
+        }
+      )
     ] }) }),
     showSubscribeModal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: styles.modalOverlay, onClick: () => setShowSubscribeModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: styles.modalContent, onClick: (e) => e.stopPropagation(), children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { style: styles.modalClose, onClick: () => setShowSubscribeModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Minus, { size: 24, style: { transform: "rotate(45deg)" } }) }),
