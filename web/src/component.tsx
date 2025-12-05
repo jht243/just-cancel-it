@@ -13,7 +13,9 @@ import {
   HelpCircle,
   ArrowRight,
   Check,
-  X
+  X,
+  TrendingUp,
+  Target
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -1680,6 +1682,124 @@ export default function RetirementCalculatorHelloWorld({ initialData }: { initia
             )}
         </div>
       )}
+
+      <div style={{
+          backgroundColor: COLORS.card,
+          borderRadius: "16px",
+          padding: "16px",
+          boxShadow: "0 4px 12px -4px rgba(0,0,0,0.05)",
+          marginBottom: "20px"
+      }}>
+          <div style={{
+              fontSize: "14px", 
+              fontWeight: 600, 
+              color: COLORS.textSecondary,
+              marginBottom: "12px",
+              textAlign: "center"
+          }}>
+              Related Calculators
+          </div>
+          <div style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              width: "100%"
+          }}>
+              {/* First row - 2 buttons */}
+              <div style={{ display: "flex", gap: "8px" }}>
+                  <button 
+                    style={{
+                        flex: 1,
+                        padding: "12px 10px",
+                        backgroundColor: COLORS.inputBg,
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: "10px",
+                        color: COLORS.primary,
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = COLORS.accentLight;
+                        e.currentTarget.style.borderColor = COLORS.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = COLORS.inputBg;
+                        e.currentTarget.style.borderColor = COLORS.border;
+                    }}
+                  >
+                      <TrendingUp size={16} />
+                      Retirement Calculator
+                  </button>
+                  <button 
+                    style={{
+                        flex: 1,
+                        padding: "12px 10px",
+                        backgroundColor: COLORS.inputBg,
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: "10px",
+                        color: COLORS.primary,
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = COLORS.accentLight;
+                        e.currentTarget.style.borderColor = COLORS.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = COLORS.inputBg;
+                        e.currentTarget.style.borderColor = COLORS.border;
+                    }}
+                  >
+                      <Target size={16} />
+                      Mortgage Calculator
+                  </button>
+              </div>
+              {/* Second row - 1 button centered */}
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                  <button 
+                    style={{
+                        flex: "0 1 50%",
+                        padding: "12px 10px",
+                        backgroundColor: COLORS.inputBg,
+                        border: `1px solid ${COLORS.border}`,
+                        borderRadius: "10px",
+                        color: COLORS.primary,
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        transition: "all 0.2s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = COLORS.accentLight;
+                        e.currentTarget.style.borderColor = COLORS.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = COLORS.inputBg;
+                        e.currentTarget.style.borderColor = COLORS.border;
+                    }}
+                  >
+                      <Check size={16} />
+                      Portfolio Analyzer
+                  </button>
+              </div>
+          </div>
+      </div>
 
       <div style={styles.footer} className="no-print">
         <button style={styles.footerBtn} onClick={() => setShowSubscribeModal(true)} className="btn-press">
