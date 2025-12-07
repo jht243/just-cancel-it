@@ -1429,7 +1429,7 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
     // Support both old (settlementId/settlementName) and new (topicId/topicName) field names
     const parsed = JSON.parse(body);
     const email = parsed.email;
-    const topicId = parsed.topicId || parsed.settlementId || "retirement-news";
+    const topicId = parsed.topicId || parsed.settlementId || "portfolio-news";
     const topicName = parsed.topicName || parsed.settlementName || "Portfolio Optimizer Updates";
     const turnstileToken = parsed.turnstileToken;
 

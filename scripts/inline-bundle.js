@@ -11,8 +11,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const htmlPath = path.join(__dirname, '../assets/bmi-health-calculator.html');
-const jsPath = path.join(__dirname, '../assets/bmi-health-calculator.js');
+const htmlPath = path.join(__dirname, '../assets/portfolio-optimizer.html');
+const jsPath = path.join(__dirname, '../assets/portfolio-optimizer.js');
 
 console.log('[Inline Bundle] Reading files...');
 const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
@@ -27,7 +27,7 @@ console.log('[Inline Bundle] Escaped script tags in JS content');
 
 // Replace the external script tag with an inline one
 const updatedHtml = htmlContent.replace(
-  /<script type="module" src="\/assets\/bmi-health-calculator\.js"><\/script>/,
+  /<script type="module" src="\/assets\/portfolio-optimizer\.js"><\/script>/,
   `<script type="module">\n${jsContent}\n</script>`
 );
 

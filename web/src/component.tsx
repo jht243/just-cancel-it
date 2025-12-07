@@ -177,7 +177,7 @@ const DEFAULT_VALUES: CalculatorValues = {
 const CALCULATOR_TYPES = ["Portfolio Optimizer"] as const;
 type CalculatorType = typeof CALCULATOR_TYPES[number];
 
-const STORAGE_KEY = "RETIREMENT_CALCULATOR_DATA";
+const STORAGE_KEY = "PORTFOLIO_OPTIMIZER_DATA";
 const EXPIRATION_DAYS = 30;
 
 const loadSavedData = (): Record<CalculatorType, CalculatorData> => {
@@ -276,7 +276,7 @@ export default function PortfolioOptimizerHelloWorld({ initialData }: { initialD
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 email,
-                topicId: "retirement-news",
+                topicId: "portfolio-news",
                 topicName: "Portfolio Optimizer Updates"
             })
         });
@@ -1207,7 +1207,7 @@ export default function PortfolioOptimizerHelloWorld({ initialData }: { initialD
   return (
     <div style={styles.container}>
       <div style={styles.headerRow}>
-        <div style={styles.title}>The Retirement Planner Pro</div>
+        <div style={styles.title}>Portfolio Optimizer Pro</div>
       </div>
       <div style={{...styles.subheader, display: 'flex', alignItems: 'center', gap: 6}}>
         <Check size={16} color={COLORS.primary} /> Aligned with Certified Financial Planner™ (CFP®) principles

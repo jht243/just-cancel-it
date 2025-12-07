@@ -1,6 +1,6 @@
-# Golden Prompt Set - BMI Health Calculator
+# Golden Prompt Set - Portfolio Optimizer
 
-This document contains test prompts to validate the BMI Health Calculator connector's metadata and behavior.
+This document contains test prompts to validate the Portfolio Optimizer connector's metadata and behavior.
 
 ## Purpose
 Use these prompts to test:
@@ -13,80 +13,80 @@ Use these prompts to test:
 ## Direct Prompts (Should ALWAYS trigger the connector)
 
 ### 1. Explicit Tool Name
-**Prompt**: "Calculate my BMI"
-**Expected**: ✅ Calls `bmi-health-calculator` with default values
+**Prompt**: "Optimize my portfolio"
+**Expected**: ✅ Calls `portfolio-optimizer` with default values
 **Status**: [ ] Pass / [ ] Fail
 
-### 2. Specific Metrics
-**Prompt**: "Calculate BMI for someone 180cm and 75kg"
-**Expected**: ✅ Calls `bmi-health-calculator` with height=180, weight=75
+### 2. Specific Allocation
+**Prompt**: "Analyze my portfolio with 60% stocks and 40% bonds"
+**Expected**: ✅ Calls `portfolio-optimizer` with stocks=60, bonds=40
 **Status**: [ ] Pass / [ ] Fail
 
-### 3. Ideal Weight Query
-**Prompt**: "What is my ideal weight if I'm 5'10"?"
-**Expected**: ✅ Calls `bmi-health-calculator` with height=5'10" (parsed)
+### 3. Investment Query
+**Prompt**: "What's the best asset allocation for a 10 year horizon?"
+**Expected**: ✅ Calls `portfolio-optimizer` with time horizon context
 **Status**: [ ] Pass / [ ] Fail
 
 ### 4. Detailed Parameters
-**Prompt**: "Calculate body fat for male, 30 years old, 180cm, 80kg, waist 85cm"
-**Expected**: ✅ Calls `bmi-health-calculator` with all parameters
+**Prompt**: "Simulate portfolio with $100k in stocks, $50k in bonds, $10k cash"
+**Expected**: ✅ Calls `portfolio-optimizer` with all parameters
 **Status**: [ ] Pass / [ ] Fail
 
-### 5. Health Assessment
-**Prompt**: "Am I overweight at 90kg and 5 foot 8 inches?"
-**Expected**: ✅ Calls `bmi-health-calculator` to analyze BMI
+### 5. Risk Assessment
+**Prompt**: "Is my portfolio too risky with 80% in stocks?"
+**Expected**: ✅ Calls `portfolio-optimizer` to analyze allocation
 **Status**: [ ] Pass / [ ] Fail
 
 ---
 
 ## Indirect Prompts (Should trigger the connector)
 
-### 6. Weight Loss Question
-**Prompt**: "How much weight should I lose?"
-**Expected**: ✅ Calls `bmi-health-calculator` to check ideal weight
+### 6. Diversification Question
+**Prompt**: "How should I diversify my investments?"
+**Expected**: ✅ Calls `portfolio-optimizer` to suggest allocation
 **Status**: [ ] Pass / [ ] Fail
 
-### 7. Fitness Progress
-**Prompt**: "Check my body composition"
-**Expected**: ✅ Calls `bmi-health-calculator`
+### 7. Investment Strategy
+**Prompt**: "Check my investment allocation"
+**Expected**: ✅ Calls `portfolio-optimizer`
 **Status**: [ ] Pass / [ ] Fail
 
 ### 8. Comparison
-**Prompt**: "Is my weight healthy for my height?"
-**Expected**: ✅ Calls `bmi-health-calculator`
+**Prompt**: "Is my portfolio balanced for growth?"
+**Expected**: ✅ Calls `portfolio-optimizer`
 **Status**: [ ] Pass / [ ] Fail
 
 ---
 
 ## Negative Prompts (Should NOT trigger the connector)
 
-### 9. Medical Diagnosis
-**Prompt**: "Why does my stomach hurt?"
-**Expected**: ❌ Does NOT call `bmi-health-calculator` (medical advice)
+### 9. Stock Picks
+**Prompt**: "What stocks should I buy?"
+**Expected**: ❌ Does NOT call `portfolio-optimizer` (specific stock advice)
 **Status**: [ ] Pass / [ ] Fail
 
-### 10. Diet Plan
-**Prompt**: "Give me a keto diet plan"
-**Expected**: ❌ Does NOT call `bmi-health-calculator` (general advice)
+### 10. Tax Advice
+**Prompt**: "How do I minimize taxes on investments?"
+**Expected**: ❌ Does NOT call `portfolio-optimizer` (tax advice)
 **Status**: [ ] Pass / [ ] Fail
 
-### 11. Exercise Routine
-**Prompt**: "Best exercises for abs"
-**Expected**: ❌ Does NOT call `bmi-health-calculator` (general advice)
+### 11. Crypto Trading
+**Prompt**: "Best time to buy Bitcoin"
+**Expected**: ❌ Does NOT call `portfolio-optimizer` (trading advice)
 **Status**: [ ] Pass / [ ] Fail
 
 ---
 
 ## Edge Cases
 
-### 12. Ambiguous Units
-**Prompt**: "I weigh 160"
-**Expected**: ✅ Calls `bmi-health-calculator` (infers lbs usually)
+### 12. Percentage Format
+**Prompt**: "I have 50% stocks"
+**Expected**: ✅ Calls `portfolio-optimizer` with stocks=50
 **Status**: [ ] Pass / [ ] Fail
 
-### 13. Mixed Units
-**Prompt**: "Height 1.8m weight 160lbs"
-**Expected**: ✅ Calls `bmi-health-calculator` with correct conversions
+### 13. Dollar Amounts
+**Prompt**: "$50,000 in index funds and $20,000 in bonds"
+**Expected**: ✅ Calls `portfolio-optimizer` with correct dollar amounts
 **Status**: [ ] Pass / [ ] Fail
 
 ---
@@ -95,7 +95,7 @@ Use these prompts to test:
 
 ### How to Test
 1. Open ChatGPT in **Developer Mode**
-2. Link your BMI Health Calculator connector
+2. Link your Portfolio Optimizer connector
 3. For each prompt above:
    - Enter the exact prompt
    - Observe which tool gets called
