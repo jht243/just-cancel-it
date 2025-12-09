@@ -312,6 +312,16 @@ const toolInputSchema = {
     alt_investments: { type: "number", description: "Dollar amount in alternative investments." },
     startups: { type: "number", description: "Dollar amount in startup investments." },
     other: { type: "number", description: "Dollar amount in other investments." },
+    // Asset allocation fields (percent amounts)
+    stocks_percent: { type: "number", description: "Percentage allocation in stocks." },
+    bonds_percent: { type: "number", description: "Percentage allocation in bonds." },
+    cash_percent: { type: "number", description: "Percentage allocation in cash." },
+    real_estate_percent: { type: "number", description: "Percentage allocation in real estate." },
+    crypto_percent: { type: "number", description: "Percentage allocation in cryptocurrency." },
+    four_oh_one_k_percent: { type: "number", description: "Percentage allocation in 401k." },
+    alt_investments_percent: { type: "number", description: "Percentage allocation in alternative investments." },
+    startups_percent: { type: "number", description: "Percentage allocation in startup investments." },
+    other_percent: { type: "number", description: "Percentage allocation in other investments." },
     // Legacy/Compatibility fields
     current_retirement_savings: { type: "number", description: "Total current retirement savings." },
     annual_pre_tax_income: { type: "number", description: "Annual pre-tax income." }
@@ -330,7 +340,7 @@ const toolInputParser = z.object({
   monthly_contribution: z.number().optional(),
   risk_tolerance: z.enum(["conservative", "balanced", "aggressive"]).optional(),
   investment_goal: z.enum(["growth", "income", "preservation"]).optional(),
-  // Asset allocation fields
+  // Asset allocation fields (dollar)
   stocks: z.number().optional(),
   bonds: z.number().optional(),
   cash: z.number().optional(),
@@ -340,6 +350,16 @@ const toolInputParser = z.object({
   alt_investments: z.number().optional(),
   startups: z.number().optional(),
   other: z.number().optional(),
+  // Asset allocation fields (percent)
+  stocks_percent: z.number().optional(),
+  bonds_percent: z.number().optional(),
+  cash_percent: z.number().optional(),
+  real_estate_percent: z.number().optional(),
+  crypto_percent: z.number().optional(),
+  four_oh_one_k_percent: z.number().optional(),
+  alt_investments_percent: z.number().optional(),
+  startups_percent: z.number().optional(),
+  other_percent: z.number().optional(),
   current_retirement_savings: z.number().optional(),
   annual_pre_tax_income: z.number().optional(),
 });
@@ -588,8 +608,8 @@ function createPortfolioOptimizerServer(): Server {
              else if (/preservation|protect|capital|safe/i.test(userText)) args.investment_goal = "preservation";
           }
           
-          // Asset allocation inference (e.g., "$100,000 in stocks", "$50k in bonds")
-          const assetPatterns: Array<{ key: keyof typeof args; regex: RegExp }> = [
+          // Asset allocation inference - DOLLAR amounts (e.g., "$100,000 in stocks", "$50k in bonds")
+          const dollarPatterns: Array<{ key: keyof typeof args; regex: RegExp }> = [
             { key: "stocks", regex: /\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)(k|m)?\s*(?:in\s+)?(?:stocks?|equities?|equity|stock market)/i },
             { key: "bonds", regex: /\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)(k|m)?\s*(?:in\s+)?(?:bonds?|fixed income|treasur(?:y|ies))/i },
             { key: "cash", regex: /\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)(k|m)?\s*(?:in\s+)?(?:cash|savings?|money market|liquid)/i },
@@ -600,7 +620,7 @@ function createPortfolioOptimizerServer(): Server {
             { key: "startups", regex: /\$\s*(\d+(?:,\d{3})*(?:\.\d+)?)(k|m)?\s*(?:in\s+)?(?:startups?|angel|venture|early[- ]stage)/i },
           ];
           
-          for (const { key, regex } of assetPatterns) {
+          for (const { key, regex } of dollarPatterns) {
             if ((args as any)[key] === undefined) {
               const match = userText.match(regex);
               if (match) {
@@ -608,6 +628,29 @@ function createPortfolioOptimizerServer(): Server {
                 if (match[2]?.toLowerCase() === 'k') amount *= 1000;
                 if (match[2]?.toLowerCase() === 'm') amount *= 1000000;
                 if (amount > 0) (args as any)[key] = amount;
+              }
+            }
+          }
+          
+          // Asset allocation inference - PERCENT amounts (e.g., "60% stocks", "30% in bonds")
+          const percentPatterns: Array<{ key: keyof typeof args; regex: RegExp }> = [
+            { key: "stocks_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:stocks?|equities?|equity|stock market)/i },
+            { key: "bonds_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:bonds?|fixed income|treasur(?:y|ies))/i },
+            { key: "cash_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:cash|savings?|money market|liquid)/i },
+            { key: "real_estate_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:real estate|reits?|property|properties)/i },
+            { key: "crypto_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:crypto(?:currency)?|bitcoin|btc|ethereum|eth)/i },
+            { key: "four_oh_one_k_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:401\s*k|401\(k\)|retirement account)/i },
+            { key: "alt_investments_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:alt(?:ernative)?\s*invest(?:ment)?s?|commodities|hedge funds?|private equity)/i },
+            { key: "startups_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:startups?|angel|venture|early[- ]stage)/i },
+            { key: "other_percent", regex: /(\d+(?:\.\d+)?)\s*%\s*(?:in\s+)?(?:other|miscellaneous|misc)/i },
+          ];
+          
+          for (const { key, regex } of percentPatterns) {
+            if ((args as any)[key] === undefined) {
+              const match = userText.match(regex);
+              if (match) {
+                const percent = parseFloat(match[1]);
+                if (percent > 0 && percent <= 100) (args as any)[key] = percent;
               }
             }
           }

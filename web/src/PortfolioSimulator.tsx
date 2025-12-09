@@ -278,16 +278,23 @@ export default function PortfolioSimulator({ initialData }: { initialData?: any 
   // Helper to check if initialData has relevant fields
   const hasInitial = (key: string) => initialData && initialData[key] !== undefined;
   
-  // Check if initialData contains any allocation data (dollar amounts for asset classes)
-  const hasAllocationData = () => {
+  // Check if initialData contains dollar allocation data
+  const hasDollarAllocation = () => {
     if (!initialData) return false;
-    const allocationKeys = ["stocks", "bonds", "cash", "real_estate", "crypto", "four_oh_one_k", "alt_investments", "startups", "other"];
-    return allocationKeys.some(key => initialData[key] !== undefined && initialData[key] > 0);
+    const dollarKeys = ["stocks", "bonds", "cash", "real_estate", "crypto", "four_oh_one_k", "alt_investments", "startups", "other"];
+    return dollarKeys.some(key => initialData[key] !== undefined && initialData[key] > 0);
+  };
+  
+  // Check if initialData contains percent allocation data
+  const hasPercentAllocation = () => {
+    if (!initialData) return false;
+    const percentKeys = ["stocks_percent", "bonds_percent", "cash_percent", "real_estate_percent", "crypto_percent", "four_oh_one_k_percent", "alt_investments_percent", "startups_percent", "other_percent"];
+    return percentKeys.some(key => initialData[key] !== undefined && initialData[key] > 0);
   };
 
   const [allocation, setAllocation] = useState<AllocationInput>(() => {
-    // If initialData has allocation fields, use them (dollar mode)
-    if (hasAllocationData()) {
+    // If initialData has dollar allocation fields, use them (dollar mode)
+    if (hasDollarAllocation()) {
       return {
         stocks: String(initialData.stocks || 0),
         bonds: String(initialData.bonds || 0),
@@ -298,6 +305,20 @@ export default function PortfolioSimulator({ initialData }: { initialData?: any 
         altInvestments: String(initialData.alt_investments || 0),
         startups: String(initialData.startups || 0),
         other: String(initialData.other || 0)
+      };
+    }
+    // If initialData has percent allocation fields, use them (percent mode)
+    if (hasPercentAllocation()) {
+      return {
+        stocks: String(initialData.stocks_percent || 0),
+        bonds: String(initialData.bonds_percent || 0),
+        cash: String(initialData.cash_percent || 0),
+        realEstate: String(initialData.real_estate_percent || 0),
+        crypto: String(initialData.crypto_percent || 0),
+        fourOhOneK: String(initialData.four_oh_one_k_percent || 0),
+        altInvestments: String(initialData.alt_investments_percent || 0),
+        startups: String(initialData.startups_percent || 0),
+        other: String(initialData.other_percent || 0)
       };
     }
     return savedData.allocation;
@@ -311,9 +332,10 @@ export default function PortfolioSimulator({ initialData }: { initialData?: any 
     return savedData.timeHorizon;
   });
 
-  // Switch to dollar mode if allocation data was provided
+  // Switch to dollar mode if dollar allocation was provided, percent mode if percent allocation was provided
   const [inputMode, setInputMode] = useState<"percent" | "dollar">(() => {
-    if (hasAllocationData()) return "dollar";
+    if (hasDollarAllocation()) return "dollar";
+    if (hasPercentAllocation()) return "percent";
     return savedData.inputMode;
   });
 

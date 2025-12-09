@@ -50482,13 +50482,18 @@ function runMonteCarloSimulation(allocation, timeHorizon, annualContribution, in
 function PortfolioSimulator({ initialData: initialData2 }) {
   const savedData = loadSavedData();
   const hasInitial = (key) => initialData2 && initialData2[key] !== void 0;
-  const hasAllocationData = () => {
+  const hasDollarAllocation = () => {
     if (!initialData2) return false;
-    const allocationKeys = ["stocks", "bonds", "cash", "real_estate", "crypto", "four_oh_one_k", "alt_investments", "startups", "other"];
-    return allocationKeys.some((key) => initialData2[key] !== void 0 && initialData2[key] > 0);
+    const dollarKeys = ["stocks", "bonds", "cash", "real_estate", "crypto", "four_oh_one_k", "alt_investments", "startups", "other"];
+    return dollarKeys.some((key) => initialData2[key] !== void 0 && initialData2[key] > 0);
+  };
+  const hasPercentAllocation = () => {
+    if (!initialData2) return false;
+    const percentKeys = ["stocks_percent", "bonds_percent", "cash_percent", "real_estate_percent", "crypto_percent", "four_oh_one_k_percent", "alt_investments_percent", "startups_percent", "other_percent"];
+    return percentKeys.some((key) => initialData2[key] !== void 0 && initialData2[key] > 0);
   };
   const [allocation, setAllocation] = (0, import_react57.useState)(() => {
-    if (hasAllocationData()) {
+    if (hasDollarAllocation()) {
       return {
         stocks: String(initialData2.stocks || 0),
         bonds: String(initialData2.bonds || 0),
@@ -50501,6 +50506,19 @@ function PortfolioSimulator({ initialData: initialData2 }) {
         other: String(initialData2.other || 0)
       };
     }
+    if (hasPercentAllocation()) {
+      return {
+        stocks: String(initialData2.stocks_percent || 0),
+        bonds: String(initialData2.bonds_percent || 0),
+        cash: String(initialData2.cash_percent || 0),
+        realEstate: String(initialData2.real_estate_percent || 0),
+        crypto: String(initialData2.crypto_percent || 0),
+        fourOhOneK: String(initialData2.four_oh_one_k_percent || 0),
+        altInvestments: String(initialData2.alt_investments_percent || 0),
+        startups: String(initialData2.startups_percent || 0),
+        other: String(initialData2.other_percent || 0)
+      };
+    }
     return savedData.allocation;
   });
   const [timeHorizon, setTimeHorizon] = (0, import_react57.useState)(() => {
@@ -50511,7 +50529,8 @@ function PortfolioSimulator({ initialData: initialData2 }) {
     return savedData.timeHorizon;
   });
   const [inputMode, setInputMode] = (0, import_react57.useState)(() => {
-    if (hasAllocationData()) return "dollar";
+    if (hasDollarAllocation()) return "dollar";
+    if (hasPercentAllocation()) return "percent";
     return savedData.inputMode;
   });
   const [annualContribution, setAnnualContribution] = (0, import_react57.useState)(() => {
