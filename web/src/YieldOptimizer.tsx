@@ -225,7 +225,7 @@ const DEFAULT_HOLDINGS: CryptoHoldings = { btc: "0", eth: "0", sol: "0", ada: "0
 const DEFAULT_DATA: SavedYieldData = {
   holdings: DEFAULT_HOLDINGS,
   amounts: DEFAULT_HOLDINGS,
-  currentYieldPercent: "0",
+  currentYieldPercent: "1",
   inputMode: "dollar"
 };
 
@@ -790,7 +790,7 @@ export default function YieldOptimizer({ initialData }: { initialData?: any }) {
       {totalPortfolio > 0 && (
         <div style={{ ...styles.card, background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%)`, color: "white", textAlign: "center" }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>
-            <span style={{ borderBottom: "3px solid rgba(255,255,255,0.8)", paddingBottom: 4 }}>This Portfolio Could Be Earning</span>
+            This Portfolio <span style={{ borderBottom: "3px solid rgba(255,255,255,0.8)", paddingBottom: 4 }}>Could Be Earning</span>
           </div>
           <div style={{ fontSize: 52, fontWeight: 900, marginBottom: 4, textShadow: "0 2px 10px rgba(0,0,0,0.2)" }}>
             ${Math.round(potentialAnnualYield).toLocaleString()}
@@ -829,7 +829,7 @@ export default function YieldOptimizer({ initialData }: { initialData?: any }) {
       {totalPortfolio > 0 && (
         <div style={styles.card}>
           <div style={{ fontSize: 16, fontWeight: 700, color: COLORS.textMain, marginBottom: 8 }}>Recommended Yield Strategies</div>
-          <div style={{ fontSize: 12, color: COLORS.textSecondary, marginBottom: 16 }}>Click "Optimize" to get started with each platform</div>
+          <div style={{ fontSize: 12, color: COLORS.textSecondary, marginBottom: 16 }}>These strategies are customized based on your choices above</div>
           
           {/* Filters */}
           <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>

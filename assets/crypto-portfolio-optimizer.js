@@ -24871,7 +24871,7 @@ var DEFAULT_HOLDINGS = { btc: "0", eth: "0", sol: "0", ada: "0", link: "0", avax
 var DEFAULT_DATA = {
   holdings: DEFAULT_HOLDINGS,
   amounts: DEFAULT_HOLDINGS,
-  currentYieldPercent: "0",
+  currentYieldPercent: "1",
   inputMode: "dollar"
 };
 var loadSavedData = () => {
@@ -25374,7 +25374,10 @@ function YieldOptimizer({ initialData: initialData2 }) {
       ] }) })
     ] }),
     totalPortfolio > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { ...styles.card, background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%)`, color: "white", textAlign: "center" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 16, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { borderBottom: "3px solid rgba(255,255,255,0.8)", paddingBottom: 4 }, children: "This Portfolio Could Be Earning" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { fontSize: 16, fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }, children: [
+        "This Portfolio ",
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { borderBottom: "3px solid rgba(255,255,255,0.8)", paddingBottom: 4 }, children: "Could Be Earning" })
+      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { fontSize: 52, fontWeight: 900, marginBottom: 4, textShadow: "0 2px 10px rgba(0,0,0,0.2)" }, children: [
         "$",
         Math.round(potentialAnnualYield).toLocaleString(),
@@ -25418,7 +25421,7 @@ function YieldOptimizer({ initialData: initialData2 }) {
     ] }),
     totalPortfolio > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: styles.card, children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 16, fontWeight: 700, color: COLORS.textMain, marginBottom: 8 }, children: "Recommended Yield Strategies" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 12, color: COLORS.textSecondary, marginBottom: 16 }, children: 'Click "Optimize" to get started with each platform' }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 12, color: COLORS.textSecondary, marginBottom: 16 }, children: "These strategies are customized based on your choices above" }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
           "select",

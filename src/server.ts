@@ -253,6 +253,7 @@ function widgetMeta(widget: CryptoPortfolioOptimizerWidget, bustCache: boolean =
       "Best DeFi strategies for Ethereum",
       "How much could I earn staking?",
       "Find yield opportunities for my portfolio",
+      "Analyze my crypto portfolio",
     ],
     "openai/widgetPrefersBorder": true,
     "openai/widgetCSP": {
