@@ -260,13 +260,11 @@ function widgetMeta(widget: CryptoPortfolioOptimizerWidget, bustCache: boolean =
       connect_domains: [
         "https://api.stlouisfed.org",
         "https://api.coingecko.com",
-        "https://crypto-portfolio-optimizer-jn05.onrender.com",
-        "http://localhost:8010"
-      ],
-      script_src_domains: [
         "https://crypto-portfolio-optimizer-jn05.onrender.com"
       ],
-      resource_domains: [],
+      resource_domains: [
+        "https://crypto-portfolio-optimizer-jn05.onrender.com"
+      ],
     },
     "openai/widgetDomain": "https://web-sandbox.oaiusercontent.com",
     "openai/toolInvocation/invoking": widget.invoking,
@@ -395,9 +393,10 @@ const tools: Tool[] = widgets.map((widget) => ({
     securitySchemes: [{ type: "noauth" }],
   },
   annotations: {
-    destructiveHint: false,
-    openWorldHint: false,
     readOnlyHint: true,
+    destructiveHint: false,
+    idempotentHint: true,
+    openWorldHint: false,
   },
 }));
 
