@@ -407,6 +407,18 @@ const saveData = (data: any) => {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, timestamp: new Date().getTime() })); } catch (e) {}
 };
 
+// Analytics tracking helper
+const trackEvent = (event: string, data: Record<string, any> = {}) => {
+  try {
+    const serverUrl = window.location.hostname === "localhost" ? "" : "https://travel-checklist-q79n.onrender.com";
+    fetch(`${serverUrl}/api/track`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, data })
+    }).catch(() => {}); // Silent fail
+  } catch {}
+};
+
 // Parse personal notes - adds items to CORRECT categories + extras to "personal"
 const parsePersonalNotes = (notes: string): ChecklistItem[] => {
   const items: ChecklistItem[] = [];
@@ -1760,6 +1772,16 @@ export default function TravelChecklist({ initialData }: { initialData?: any }) 
   };
   
   const handleGenerate = () => { 
+    // Track checklist generation
+    trackEvent("widget_generate_checklist", {
+      destination: profile.destination,
+      tripDuration: profile.tripDuration,
+      isInternational: profile.isInternational,
+      purpose: profile.purpose,
+      climate: profile.climate,
+      travelerCount: getIndividualTravelers(profile.travelers).length
+    });
+    
     // Generate shared checklist
     setChecklist(generateChecklist(profile)); 
     
@@ -1857,6 +1879,7 @@ export default function TravelChecklist({ initialData }: { initialData?: any }) 
   };
   
   const toggleItem = (id: string) => {
+    trackEvent("widget_check_item", { itemId: id, tab: selectedTab });
     if (selectedTab === "shared") {
       setChecklist(items => items.map(i => i.id === id ? { ...i, checked: !i.checked } : i));
     } else {
@@ -1879,6 +1902,7 @@ export default function TravelChecklist({ initialData }: { initialData?: any }) 
   };
 
   const addItem = (category: string, name: string, quantity?: string) => {
+    trackEvent("widget_add_custom_item", { category, itemName: name, tab: selectedTab });
     const newItem: ChecklistItem = {
       id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
@@ -1907,6 +1931,7 @@ export default function TravelChecklist({ initialData }: { initialData?: any }) 
 
   const handleSaveChecklist = () => {
     if (!saveChecklistName.trim()) return;
+    trackEvent("widget_save_checklist", { name: saveChecklistName.trim(), isUpdate: !!editingChecklistId });
     
     const newSaved: SavedChecklist = {
       id: editingChecklistId || `saved-${Date.now()}`,
@@ -2634,7 +2659,7 @@ export default function TravelChecklist({ initialData }: { initialData?: any }) 
                 {getTraveler("pet").male > 0 && <span style={{ display: "flex", alignItems: "center", gap: 3 }}>🐕 {getTraveler("pet").male}</span>}
                 {getTraveler("pet").female > 0 && <span style={{ display: "flex", alignItems: "center", gap: 3 }}>🐈 {getTraveler("pet").female}</span>}
               </span>
-              <button onClick={() => window.print()} style={{ marginLeft: "auto", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 8, padding: "6px 10px", color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+              <button onClick={() => { trackEvent("widget_print_share", { destination: profile.destination }); window.print(); }} style={{ marginLeft: "auto", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 8, padding: "6px 10px", color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
                 <Printer size={14} /> Print
               </button>
             </div>
@@ -2875,7 +2900,7 @@ export default function TravelChecklist({ initialData }: { initialData?: any }) 
         <button style={styles.footerBtn} onClick={resetAll}><RotateCcw size={16} /> Reset</button>
         <button style={styles.footerBtn}><Heart size={16} /> Donate</button>
         <button style={styles.footerBtn}><MessageSquare size={16} /> Feedback</button>
-        <button style={styles.footerBtn} onClick={() => window.print()}><Printer size={16} /> Print</button>
+        <button style={styles.footerBtn} onClick={() => { trackEvent("widget_print_share", { destination: profile.destination }); window.print(); }}><Printer size={16} /> Print</button>
       </div>
       </div>{/* End screen-view */}
 

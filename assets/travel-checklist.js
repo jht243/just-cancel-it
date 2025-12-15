@@ -25209,6 +25209,18 @@ var saveData = (data) => {
   } catch (e) {
   }
 };
+var trackEvent = (event, data = {}) => {
+  try {
+    const serverUrl = window.location.hostname === "localhost" ? "" : "https://travel-checklist-q79n.onrender.com";
+    fetch(`${serverUrl}/api/track`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, data })
+    }).catch(() => {
+    });
+  } catch {
+  }
+};
 var parsePersonalNotes = (notes) => {
   const items = [];
   const lower = notes.toLowerCase();
@@ -26365,6 +26377,14 @@ function TravelChecklist({ initialData: initialData2 }) {
     return individualPrefs[travelerId] || { notes: "", presets: [] };
   };
   const handleGenerate = () => {
+    trackEvent("widget_generate_checklist", {
+      destination: profile.destination,
+      tripDuration: profile.tripDuration,
+      isInternational: profile.isInternational,
+      purpose: profile.purpose,
+      climate: profile.climate,
+      travelerCount: getIndividualTravelers(profile.travelers).length
+    });
     setChecklist(generateChecklist(profile));
     const indivLists = {};
     const travelers = getIndividualTravelers(profile.travelers);
@@ -26427,6 +26447,7 @@ function TravelChecklist({ initialData: initialData2 }) {
     }, 100);
   };
   const toggleItem = (id) => {
+    trackEvent("widget_check_item", { itemId: id, tab: selectedTab });
     if (selectedTab === "shared") {
       setChecklist((items) => items.map((i) => i.id === id ? { ...i, checked: !i.checked } : i));
     } else {
@@ -26447,6 +26468,7 @@ function TravelChecklist({ initialData: initialData2 }) {
     }
   };
   const addItem = (category, name, quantity) => {
+    trackEvent("widget_add_custom_item", { category, itemName: name, tab: selectedTab });
     const newItem = {
       id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name,
@@ -26481,6 +26503,7 @@ function TravelChecklist({ initialData: initialData2 }) {
   };
   const handleSaveChecklist = () => {
     if (!saveChecklistName.trim()) return;
+    trackEvent("widget_save_checklist", { name: saveChecklistName.trim(), isUpdate: !!editingChecklistId });
     const newSaved = {
       id: editingChecklistId || `saved-${Date.now()}`,
       name: saveChecklistName.trim(),
@@ -27242,7 +27265,10 @@ function TravelChecklist({ initialData: initialData2 }) {
                 getTraveler("pet").female
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => window.print(), style: { marginLeft: "auto", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 8, padding: "6px 10px", color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => {
+              trackEvent("widget_print_share", { destination: profile.destination });
+              window.print();
+            }, style: { marginLeft: "auto", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 8, padding: "6px 10px", color: "white", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }, children: [
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Printer, { size: 14 }),
               " Print"
             ] })
@@ -27547,7 +27573,10 @@ function TravelChecklist({ initialData: initialData2 }) {
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageSquare, { size: 16 }),
           " Feedback"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { style: styles.footerBtn, onClick: () => window.print(), children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { style: styles.footerBtn, onClick: () => {
+          trackEvent("widget_print_share", { destination: profile.destination });
+          window.print();
+        }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Printer, { size: 16 }),
           " Print"
         ] })
