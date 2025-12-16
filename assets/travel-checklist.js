@@ -27549,17 +27549,18 @@ function TravelChecklist({ initialData: initialData2 }) {
         bottom: 0,
         backgroundColor: "rgba(0,0,0,0.5)",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "center",
-        zIndex: 1e3,
-        padding: 20
+        paddingTop: "20px",
+        zIndex: 1e3
       }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
         backgroundColor: "white",
         borderRadius: 20,
         padding: 24,
         width: "100%",
         maxWidth: 400,
-        boxShadow: "0 20px 60px rgba(0,0,0,0.3)"
+        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        marginTop: 0
       }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { margin: 0, fontSize: 18, fontWeight: 700 }, children: editingChecklistId ? "Update Checklist" : "Save Checklist" }),
@@ -27672,15 +27673,17 @@ function TravelChecklist({ initialData: initialData2 }) {
       bottom: 0,
       backgroundColor: "rgba(0,0,0,0.5)",
       display: "flex",
-      alignItems: "center",
+      alignItems: "flex-start",
       justifyContent: "center",
+      paddingTop: "20px",
       zIndex: 1e3
     }, onClick: () => setShowFeedbackModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
       backgroundColor: "white",
       borderRadius: 16,
       padding: 24,
       width: "90%",
-      maxWidth: 400
+      maxWidth: 400,
+      marginTop: 0
     }, onClick: (e) => e.stopPropagation(), children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { margin: 0, fontSize: 20, fontWeight: 700 }, children: "Feedback" }),
@@ -27733,15 +27736,17 @@ function TravelChecklist({ initialData: initialData2 }) {
       bottom: 0,
       backgroundColor: "rgba(0,0,0,0.5)",
       display: "flex",
-      alignItems: "center",
+      alignItems: "flex-start",
       justifyContent: "center",
+      paddingTop: "20px",
       zIndex: 1e3
     }, onClick: () => setShowSubscribeModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
       backgroundColor: "white",
       borderRadius: 16,
       padding: 24,
       width: "90%",
-      maxWidth: 400
+      maxWidth: 400,
+      marginTop: 0
     }, onClick: (e) => e.stopPropagation(), children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { margin: 0, fontSize: 20, fontWeight: 700 }, children: "Sign Up For Travel Tips" }),
