@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: crypto-portfolio-optimizer
+    name: just-cancel
     env: node
     plan: free
     region: oregon

@@ -1,11 +1,11 @@
 # Privacy Policy
 
-**Smart Travel Checklist**  
+**Just Cancel**  
 *Last Updated: December 2024*
 
 ## Overview
 
-Smart Travel Checklist is a personalized packing list generator that runs entirely in your browser within ChatGPT. We are committed to protecting your privacy and being transparent about our data practices.
+Just Cancel is a subscription management tool that runs entirely in your browser within ChatGPT. We are committed to protecting your privacy and being transparent about our data practices.
 
 ## Data Collection
 
@@ -24,14 +24,14 @@ Smart Travel Checklist is a personalized packing list generator that runs entire
 
 ## Data Processing
 
-All checklist generation and customization is performed:
+All subscription analysis and recommendations are performed:
 - **Client-side**: In your browser within the ChatGPT sandbox
-- **Locally**: Your trip details and checklist are processed locally and not stored on our servers
+- **Locally**: Your subscription data is processed locally and not stored on our servers
 - **Ephemerally**: Session data is not persisted beyond the active session
 
 ## Data Storage
 
-- **Browser LocalStorage**: Your trip details and checklist may be cached in your browser's localStorage for convenience (30-day expiration). This data never leaves your device.
+- **Browser LocalStorage**: Your subscription data may be cached in your browser's localStorage for convenience (30-day expiration). This data never leaves your device.
 - **Server Logs**: Anonymous analytics are logged for up to 30 days for service improvement.
 
 ## Third-Party Sharing

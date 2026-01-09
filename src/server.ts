@@ -30,7 +30,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-type TravelChecklistWidget = {
+type JustCancelWidget = {
   id: string;
   title: string;
   templateUri: string;
@@ -103,7 +103,7 @@ function getRecentLogs(days: number = 7): AnalyticsEvent[] {
       lines.forEach((line) => {
         try {
           logs.push(JSON.parse(line));
-        } catch (e) {}
+        } catch (e) { }
       });
     }
   }
@@ -124,31 +124,23 @@ function classifyDevice(userAgent?: string | null): string {
 }
 
 function computeSummary(args: any) {
-  // Compute travel checklist summary
-  const destination = args.destination || "Not specified";
-  const tripDuration = Number(args.trip_duration) || 5;
-  const isInternational = Boolean(args.is_international);
-  const climate = args.climate || "summer";
-  const purpose = args.purpose || "leisure";
-  const travelers = Number(args.travelers) || 1;
-  
-  // Estimate checklist items based on trip profile
-  let estimatedItems = 25; // Base items
-  if (isInternational) estimatedItems += 5; // Extra documents
-  if (tripDuration > 7) estimatedItems += 5; // More clothing
-  if (purpose === "business") estimatedItems += 3;
-  if (purpose === "adventure") estimatedItems += 8;
-  if (travelers > 1) estimatedItems += 5;
-  
+  // Compute subscription analysis summary
+  const subscriptionCount = Number(args.subscription_count) || 5;
+  const monthlySpend = Number(args.monthly_spend) || 50;
+  const usageLevel = args.usage_level || "medium";
+
+  // Estimate potential savings
+  let estimatedSavings = 0;
+  if (usageLevel === "low") estimatedSavings = monthlySpend * 0.5;
+  else if (usageLevel === "medium") estimatedSavings = monthlySpend * 0.3;
+  else estimatedSavings = monthlySpend * 0.1;
+
   return {
-    destination,
-    trip_duration: tripDuration,
-    is_international: isInternational,
-    climate,
-    purpose,
-    travelers,
-    estimated_items: estimatedItems,
-    trip_type: isInternational ? "International" : "Domestic"
+    subscription_count: subscriptionCount,
+    monthly_spend: monthlySpend,
+    usage_level: usageLevel,
+    estimated_savings: Math.round(estimatedSavings),
+    analysis_type: "Subscription Analysis"
   };
 }
 
@@ -201,59 +193,57 @@ function readWidgetHtml(componentName: string): string {
 // Added timestamp suffix to force cache invalidation for width fix
 const VERSION = (process.env.RENDER_GIT_COMMIT?.slice(0, 7) || Date.now().toString()) + '-' + Date.now();
 
-function widgetMeta(widget: TravelChecklistWidget, bustCache: boolean = false) {
+function widgetMeta(widget: JustCancelWidget, bustCache: boolean = false) {
   const templateUri = bustCache
-    ? `ui://widget/travel-checklist.html?v=${VERSION}`
+    ? `ui://widget/just-cancel.html?v=${VERSION}`
     : widget.templateUri;
 
   return {
     "openai/outputTemplate": templateUri,
     "openai/widgetDescription":
-      "A smart travel checklist generator that creates personalized, customizable packing lists based on your trip profile. Generates checklists for documents, clothing, toiletries, health, tech, activities, and pre-departure tasks. Call this tool immediately with NO arguments to let the user enter their trip details manually. Only provide arguments if the user has explicitly stated them.",
+      "A subscription management tool that helps you analyze your subscriptions and discover which ones to cancel to save money. Call this tool immediately with NO arguments to let the user enter their subscription details manually. Only provide arguments if the user has explicitly stated them.",
     "openai/componentDescriptions": {
-      "trip-form": "Input form for trip details including destination, duration, travelers, climate, and purpose.",
-      "checklist-display": "Display showing categorized packing checklist items with checkboxes.",
-      "progress-tracker": "Progress bar showing how many items have been packed.",
+      "subscription-form": "Input form for subscription details including monthly spend and usage patterns.",
+      "analysis-display": "Display showing subscription analysis and cancellation recommendations.",
+      "savings-tracker": "Progress tracker showing potential monthly savings.",
     },
     "openai/widgetKeywords": [
-      "travel",
-      "checklist",
-      "packing",
-      "vacation",
-      "trip",
-      "luggage",
-      "travel planning",
-      "packing list",
-      "documents",
-      "toiletries",
-      "clothes",
-      "international",
-      "domestic"
+      "subscriptions",
+      "cancel",
+      "money saving",
+      "budget",
+      "streaming",
+      "software",
+      "cost reduction",
+      "subscription management",
+      "monthly expenses",
+      "financial planning",
+      "saving money"
     ],
     "openai/sampleConversations": [
-      { "user": "What should I pack for my trip?", "assistant": "Here is the Smart Travel Checklist. Enter your trip details to generate a personalized packing list." },
-      { "user": "I'm going to Paris for 7 days", "assistant": "I'll create a customized packing checklist for your 7-day trip to Paris with all the essentials." },
-      { "user": "Help me pack for a beach vacation", "assistant": "I've loaded the travel checklist for a beach trip. It includes swimwear, sunscreen, and other beach essentials." },
+      { "user": "Which subscriptions should I cancel?", "assistant": "Here is Just Cancel. Enter your subscription details to analyze which ones you should cancel to save money." },
+      { "user": "I want to reduce my monthly subscription costs", "assistant": "I'll analyze your subscriptions and show you which ones to cancel for maximum savings." },
+      { "user": "Help me save money on streaming services", "assistant": "I've loaded Just Cancel to help you identify streaming subscriptions you can cancel." },
     ],
     "openai/starterPrompts": [
-      "What should I pack for my trip?",
-      "Create a packing list for my vacation",
-      "Help me pack for an international trip",
-      "Beach vacation packing checklist",
-      "Business trip essentials",
-      "What clothing do I need to travel to New York?",
-      "Family vacation packing list",
+      "Which subscriptions should I cancel?",
+      "Help me save money on subscriptions",
+      "Analyze my monthly subscription costs",
+      "What subscriptions am I wasting money on?",
+      "Reduce my streaming service costs",
+      "Show me subscriptions I rarely use",
+      "Help me cut my monthly expenses",
     ],
     "openai/widgetPrefersBorder": true,
     "openai/widgetCSP": {
       connect_domains: [
-        "https://travel-checklist-q79n.onrender.com",
+        "https://just-cancel.onrender.com",
         "https://nominatim.openstreetmap.org",
         "https://api.open-meteo.com",
         "https://geocoding-api.open-meteo.com"
       ],
       resource_domains: [
-        "https://travel-checklist-q79n.onrender.com"
+        "https://just-cancel.onrender.com"
       ],
     },
     "openai/widgetDomain": "https://web-sandbox.oaiusercontent.com",
@@ -264,21 +254,21 @@ function widgetMeta(widget: TravelChecklistWidget, bustCache: boolean = false) {
   } as const;
 }
 
-const widgets: TravelChecklistWidget[] = [
+const widgets: JustCancelWidget[] = [
   {
-    id: "travel-checklist",
-    title: "Smart Travel Checklist — Generate personalized packing lists for any trip",
-    templateUri: `ui://widget/travel-checklist.html?v=${VERSION}`,
+    id: "just-cancel",
+    title: "Just Cancel — Discover which subscriptions you should cancel to save money",
+    templateUri: `ui://widget/just-cancel.html?v=${VERSION}`,
     invoking:
-      "Opening the Smart Travel Checklist...",
+      "Opening Just Cancel...",
     invoked:
-      "Here is the Smart Travel Checklist. Enter your trip details to generate a personalized packing list with documents, clothing, toiletries, and more.",
-    html: readWidgetHtml("travel-checklist"),
+      "Here is Just Cancel. Analyze your subscriptions to discover which ones you should cancel to save money.",
+    html: readWidgetHtml("just-cancel"),
   },
 ];
 
-const widgetsById = new Map<string, TravelChecklistWidget>();
-const widgetsByUri = new Map<string, TravelChecklistWidget>();
+const widgetsById = new Map<string, JustCancelWidget>();
+const widgetsByUri = new Map<string, JustCancelWidget>();
 
 widgets.forEach((widget) => {
   widgetsById.set(widget.id, widget);
@@ -288,28 +278,10 @@ widgets.forEach((widget) => {
 const toolInputSchema = {
   type: "object",
   properties: {
-    destination: { type: "string", description: "Travel destination (city, country, or region)." },
-    start_date: { type: "string", description: "Trip start date in YYYY-MM-DD format (use this only if user gives exact date)." },
-    end_date: { type: "string", description: "Trip end date in YYYY-MM-DD format (use this only if user gives exact date)." },
-    trip_month: { type: "string", description: "Month of travel if user says 'in December', 'in January', etc. Use lowercase month name." },
-    departure_timing: { type: "string", enum: ["this_week", "next_week", "in_two_weeks", "in_three_weeks", "this_weekend", "next_weekend", "next_month", "in_two_months"], description: "Relative departure timing like 'going in two weeks', 'leaving next week', 'this weekend'." },
-    trip_duration: { type: "number", description: "Trip duration in days." },
-    trip_weeks: { type: "number", description: "Trip duration in weeks if user says 'for one week', 'for two weeks', etc." },
-    is_international: { type: "boolean", description: "Whether this is an international trip." },
-    climate: { type: "string", enum: ["summer", "winter", "spring", "tropical", "variable"], description: "Expected weather/climate at destination." },
-    purpose: { type: "string", enum: ["leisure", "business", "adventure", "beach", "city"], description: "Primary purpose of the trip." },
-    adult_males: { type: "number", description: "Number of adult male travelers." },
-    adult_females: { type: "number", description: "Number of adult female travelers." },
-    male_children: { type: "number", description: "Number of male children." },
-    female_children: { type: "number", description: "Number of female children." },
-    infants: { type: "number", description: "Number of infants." },
-    travelers: { type: "number", description: "Total number of travelers (if breakdown not specified, assume adult males)." },
-    packing_constraint: { type: "string", enum: ["carry_on_only", "checked_bags", "minimal"], description: "Luggage type constraint." },
-    has_children: { type: "boolean", description: "Whether traveling with children." },
-    has_infants: { type: "boolean", description: "Whether traveling with infants." },
-    has_pets: { type: "boolean", description: "Whether traveling with pets." },
-    activities: { type: "array", items: { type: "string" }, description: "Planned activities (hiking, beach, camping, etc.)." },
-    presets: { type: "array", items: { type: "string", enum: ["lightSleeper", "gymRat", "yoga", "swimmer", "remoteWorker", "contentCreator", "gamer", "photographer"] }, description: "Traveler presets - lightSleeper (mentions sleep issues, light sleeper), gymRat (gym, workout, fitness), yoga, swimmer (swimming, pool), remoteWorker (remote work, digital nomad), contentCreator (influencer, content creator, vlogger), gamer (gaming), photographer (photography)." },
+    // Manual subscription entry
+    subscriptions: { type: "array", items: { type: "object", properties: { service: { type: "string" }, monthly_cost: { type: "number" }, category: { type: "string" } } }, description: "Manually entered subscriptions if known." },
+    total_monthly_spend: { type: "number", description: "Total monthly subscription spending if known." },
+    view_filter: { type: "string", enum: ["all", "cancelling", "keeping", "investigating"], description: "Which subscriptions to show." },
   },
   required: [],
   additionalProperties: false,
@@ -317,58 +289,49 @@ const toolInputSchema = {
 } as const;
 
 const toolInputParser = z.object({
-  destination: z.string().optional(),
-  start_date: z.string().optional(),
-  end_date: z.string().optional(),
-  trip_month: z.string().optional(),
-  departure_timing: z.enum(["this_week", "next_week", "in_two_weeks", "in_three_weeks", "this_weekend", "next_weekend", "next_month", "in_two_months"]).optional(),
-  trip_duration: z.number().optional(),
-  trip_weeks: z.number().optional(),
-  is_international: z.boolean().optional(),
-  climate: z.enum(["summer", "winter", "spring", "tropical", "variable"]).optional(),
-  purpose: z.enum(["leisure", "business", "adventure", "beach", "city"]).optional(),
-  adult_males: z.number().optional(),
-  adult_females: z.number().optional(),
-  male_children: z.number().optional(),
-  female_children: z.number().optional(),
-  infants: z.number().optional(),
-  travelers: z.number().optional(),
-  packing_constraint: z.enum(["carry_on_only", "checked_bags", "minimal"]).optional(),
-  has_children: z.boolean().optional(),
-  has_infants: z.boolean().optional(),
-  has_pets: z.boolean().optional(),
-  activities: z.array(z.string()).optional(),
-  presets: z.array(z.enum(["lightSleeper", "gymRat", "yoga", "swimmer", "remoteWorker", "contentCreator", "gamer", "photographer"])).optional(),
+  subscriptions: z.array(z.object({
+    service: z.string(),
+    monthly_cost: z.number(),
+    category: z.string().optional(),
+  })).optional(),
+  total_monthly_spend: z.number().optional(),
+  view_filter: z.enum(["all", "cancelling", "keeping", "investigating"]).optional(),
 });
 
 const tools: Tool[] = widgets.map((widget) => ({
   name: widget.id,
   description:
-    "Use this tool to generate a personalized travel packing checklist based on location, number of travelers, travel preferences, and other details. Helps users create customized packing lists based on their trip details. Call this tool immediately with NO arguments to let the user enter their trip details manually. Only provide arguments if the user has explicitly stated them.",
+    "Use this tool to analyze subscriptions and discover which ones to cancel to save money. Helps users identify underutilized or wasteful subscriptions. Call this tool immediately with NO arguments to let the user enter their subscription details manually. Only provide arguments if the user has explicitly stated them.",
   inputSchema: toolInputSchema,
   outputSchema: {
     type: "object",
     properties: {
       ready: { type: "boolean" },
       timestamp: { type: "string" },
-      destination: { type: "string" },
-      trip_duration: { type: "number" },
-      is_international: { type: "boolean" },
-      climate: { type: "string" },
-      purpose: { type: "string" },
-      travelers: { type: "number" },
-      input_source: { type: "string", enum: ["user", "default"] },
+      subscriptions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            service: { type: "string" },
+            monthly_cost: { type: "number" },
+            status: { type: "string", enum: ["cancelling", "keeping", "investigating"] },
+            notes: { type: "string" },
+            cancel_link: { type: "string" },
+            category: { type: "string" },
+          },
+        },
+      },
       summary: {
         type: "object",
         properties: {
-          destination: { type: ["string", "null"] },
-          trip_duration: { type: ["number", "null"] },
-          is_international: { type: ["boolean", "null"] },
-          climate: { type: ["string", "null"] },
-          purpose: { type: ["string", "null"] },
-          travelers: { type: ["number", "null"] },
-          estimated_items: { type: ["number", "null"] },
-          trip_type: { type: ["string", "null"] },
+          monthly_savings: { type: ["number", "null"] },
+          yearly_savings: { type: ["number", "null"] },
+          total_yearly_spending: { type: ["number", "null"] },
+          cancelling_count: { type: ["number", "null"] },
+          investigating_count: { type: ["number", "null"] },
+          keeping_count: { type: ["number", "null"] },
+          total_count: { type: ["number", "null"] },
         },
       },
       suggested_followups: {
@@ -396,7 +359,7 @@ const resources: Resource[] = widgets.map((widget) => ({
   uri: widget.templateUri,
   name: widget.title,
   description:
-    "HTML template for the Travel Checklist widget that generates personalized packing lists based on trip details.",
+    "HTML template for the Just Cancel widget that helps analyze subscriptions and identify which ones to cancel for savings.",
   mimeType: "text/html+skybridge",
   _meta: widgetMeta(widget),
 }));
@@ -405,18 +368,18 @@ const resourceTemplates: ResourceTemplate[] = widgets.map((widget) => ({
   uriTemplate: widget.templateUri,
   name: widget.title,
   description:
-    "Template descriptor for the Travel Checklist widget.",
+    "Template descriptor for the Just Cancel widget.",
   mimeType: "text/html+skybridge",
   _meta: widgetMeta(widget),
 }));
 
-function createTravelChecklistServer(): Server {
+function createJustCancelServer(): Server {
   const server = new Server(
     {
-      name: "travel-checklist",
+      name: "just-cancel",
       version: "0.1.0",
       description:
-        "Smart Travel Checklist helps users generate personalized packing lists based on their trip profile including destination, duration, climate, and activities.",
+        "Just Cancel helps users analyze their subscriptions and discover which ones to cancel to save money on monthly expenses.",
     },
     {
       capabilities: {
@@ -479,10 +442,10 @@ function createTravelChecklistServer(): Server {
       const startTime = Date.now();
       let userAgentString: string | null = null;
       let deviceCategory = "Unknown";
-      
+
       // Log the full request to debug _meta location
       console.log("Full request object:", JSON.stringify(request, null, 2));
-      
+
       try {
         const widget = widgetsById.get(request.params.name);
 
@@ -514,11 +477,11 @@ function createTravelChecklistServer(): Server {
         const userAgent = meta["openai/userAgent"];
         userAgentString = typeof userAgent === "string" ? userAgent : null;
         deviceCategory = classifyDevice(userAgentString);
-        
+
         // Debug log
         console.log("Captured meta:", { userLocation, userLocale, userAgent });
 
-        // If ChatGPT didn't pass structured arguments, try to infer travel details from freeform text in meta
+        // If ChatGPT didn't pass structured arguments, try to infer details from freeform text in meta
         try {
           const candidates: any[] = [
             meta["openai/subject"],
@@ -530,84 +493,11 @@ function createTravelChecklistServer(): Server {
           ];
           const userText = candidates.find((t) => typeof t === "string" && t.trim().length > 0) || "";
 
-          // Try to infer destination from user text (e.g., "trip to Paris", "vacation in Hawaii")
-          if (args.destination === undefined) {
-            const destMatch = userText.match(/(?:trip|travel|going|vacation|visit|flying)\s+(?:to|in)\s+([A-Za-z\s,]+?)(?:\.|,|for|\s+\d|\s*$)/i);
-            if (destMatch) {
-              args.destination = destMatch[1].trim();
-            }
-          }
-          
-          // Try to infer trip duration (e.g., "7 days", "2 weeks", "a week")
-          if (args.trip_duration === undefined) {
-            const durationMatch = userText.match(/(\d+)\s*(?:day|night)s?/i);
-            if (durationMatch) {
-              args.trip_duration = parseInt(durationMatch[1]);
-            } else if (/a\s+week|one\s+week/i.test(userText)) {
-              args.trip_duration = 7;
-            } else if (/two\s+weeks?|2\s+weeks?/i.test(userText)) {
-              args.trip_duration = 14;
-            }
-          }
-          
-          // Infer international vs domestic
-          if (args.is_international === undefined) {
-            if (/international|abroad|overseas|passport/i.test(userText)) {
-              args.is_international = true;
-            } else if (/domestic|within|local/i.test(userText)) {
-              args.is_international = false;
-            }
-          }
-          
-          // Infer climate from keywords
-          if (args.climate === undefined) {
-            if (/beach|tropical|caribbean|hawaii|mexico|thailand|bali/i.test(userText)) args.climate = "tropical";
-            else if (/winter|cold|snow|ski|skiing|christmas|december|january|february/i.test(userText)) args.climate = "winter";
-            else if (/summer|hot|warm|july|august|june/i.test(userText)) args.climate = "summer";
-            else if (/spring|fall|autumn|mild/i.test(userText)) args.climate = "spring";
-          }
-          
-          // Infer purpose from keywords
-          if (args.purpose === undefined) {
-            if (/business|work|conference|meeting/i.test(userText)) args.purpose = "business";
-            else if (/beach|swim|ocean|resort/i.test(userText)) args.purpose = "beach";
-            else if (/hike|hiking|adventure|camping|outdoor/i.test(userText)) args.purpose = "adventure";
-            else if (/city|urban|sightseeing|museum/i.test(userText)) args.purpose = "city";
-          }
-          
-          // Infer presets from keywords
-          if (!args.presets || args.presets.length === 0) {
-            const inferredPresets: ("lightSleeper" | "gymRat" | "yoga" | "swimmer" | "remoteWorker" | "contentCreator" | "gamer" | "photographer")[] = [];
-            if (/light\s*sleeper|trouble\s*sleep|insomnia|sleep\s*issues|noise\s*sensitive/i.test(userText)) inferredPresets.push("lightSleeper");
-            if (/gym|workout|fitness|exercise|weight\s*train|lift\s*weight/i.test(userText)) inferredPresets.push("gymRat");
-            if (/yoga|meditat|stretch/i.test(userText)) inferredPresets.push("yoga");
-            if (/swim|pool|lap\s*swim/i.test(userText)) inferredPresets.push("swimmer");
-            if (/remote\s*work|digital\s*nomad|work\s*remote|laptop|home\s*office/i.test(userText)) inferredPresets.push("remoteWorker");
-            if (/content\s*creat|influencer|vlog|youtube|tiktok|social\s*media/i.test(userText)) inferredPresets.push("contentCreator");
-            if (/gamer|gaming|video\s*game|nintendo|switch|playstation|xbox/i.test(userText)) inferredPresets.push("gamer");
-            if (/photograph|camera|dslr|mirrorless|shoot\s*photo/i.test(userText)) inferredPresets.push("photographer");
-            if (inferredPresets.length > 0) args.presets = inferredPresets;
-          }
-          
-          // Infer travelers from relationship mentions
-          // "with my girlfriend/wife/partner" = 1 adult male (me) + 1 adult female
-          // "with my boyfriend/husband" = 1 adult female (me) + 1 adult male
-          if (!args.adult_males && !args.adult_females && !args.travelers) {
-            if (/\b(girlfriend|wife|gf)\b/i.test(userText)) {
-              // User is likely male, traveling with female partner
-              args.adult_males = 1;
-              args.adult_females = 1;
-            } else if (/\b(boyfriend|husband|bf)\b/i.test(userText)) {
-              // User is likely female, traveling with male partner
-              args.adult_females = 1;
-              args.adult_males = 1;
-            } else if (/\b(partner|spouse)\b/i.test(userText)) {
-              // Gender-neutral, assume 1 male + 1 female
-              args.adult_males = 1;
-              args.adult_females = 1;
-            } else if (/\bfor\s+(?:me|myself)\b/i.test(userText) && !(/\bwith\b/i.test(userText))) {
-              // Solo traveler - "for me", "for myself" without "with"
-              args.adult_males = 1;
+          // Simple inference for subscriptions if not provided (placeholder for more advanced AI logic)
+          if (!args.total_monthly_spend) {
+            const spendMatch = userText.match(/\$(\d+)/);
+            if (spendMatch) {
+              args.total_monthly_spend = parseInt(spendMatch[1]);
             }
           }
 
@@ -623,25 +513,27 @@ function createTravelChecklistServer(): Server {
 
         // Infer likely user query from parameters
         const inferredQuery = [] as string[];
-        if (args.destination) inferredQuery.push(`Destination: ${args.destination}`);
-        if (args.trip_duration) inferredQuery.push(`Duration: ${args.trip_duration} days`);
-        if (args.purpose) inferredQuery.push(`Purpose: ${args.purpose}`);
-        if (args.climate) inferredQuery.push(`Climate: ${args.climate}`);
+        if (args.subscriptions && args.subscriptions.length > 0) {
+          inferredQuery.push(`${args.subscriptions.length} subscriptions`);
+        }
+        if (args.total_monthly_spend) {
+          inferredQuery.push(`Spend: $${args.total_monthly_spend}`);
+        }
 
         logAnalytics("tool_call_success", {
           toolName: request.params.name,
           params: args,
-          inferredQuery: inferredQuery.length > 0 ? inferredQuery.join(", ") : "Travel Checklist",
+          inferredQuery: inferredQuery.length > 0 ? inferredQuery.join(", ") : "Just Cancel",
           responseTime,
 
           device: deviceCategory,
           userLocation: userLocation
             ? {
-                city: userLocation.city,
-                region: userLocation.region,
-                country: userLocation.country,
-                timezone: userLocation.timezone,
-              }
+              city: userLocation.city,
+              region: userLocation.region,
+              country: userLocation.country,
+              timezone: userLocation.timezone,
+            }
             : null,
           userLocale,
           userAgent,
@@ -652,7 +544,7 @@ function createTravelChecklistServer(): Server {
         console.log(`[MCP] Tool called: ${request.params.name}, returning templateUri: ${(widgetMetadata as any)["openai/outputTemplate"]}`);
 
         // Build structured content once so we can log it and return it.
-        // For the travel checklist, expose fields relevant to trip details
+        // For just-cancel, expose fields relevant to subscription details
         const structured = {
           ready: true,
           timestamp: new Date().toISOString(),
@@ -661,10 +553,10 @@ function createTravelChecklistServer(): Server {
           // Summary + follow-ups for natural language UX
           summary: computeSummary(args),
           suggested_followups: [
-            "What documents do I need?",
-            "What clothes should I pack?",
-            "Do I need any vaccines?",
-            "What about toiletries for carry-on?"
+            "Which subscriptions should I cancel?",
+            "How much can I save monthly?",
+            "Show me my most expensive subscriptions",
+            "Help me lower my monthly bills"
           ],
         } as const;
 
@@ -687,26 +579,26 @@ function createTravelChecklistServer(): Server {
 
         // Log success analytics
         try {
-          // Check for "empty" result - when no main travel inputs are provided
-          const hasMainInputs = args.destination || args.trip_duration || args.purpose;
-          
+          // Check for "empty" result - when no subscription info provided
+          const hasMainInputs = (args.subscriptions && args.subscriptions.length > 0) || args.total_monthly_spend;
+
           if (!hasMainInputs) {
-             logAnalytics("tool_call_empty", {
-               toolName: request.params.name,
-               params: request.params.arguments || {},
-               reason: "No trip details provided"
-             });
+            logAnalytics("tool_call_empty", {
+              toolName: request.params.name,
+              params: request.params.arguments || {},
+              reason: "No subscription details provided"
+            });
           } else {
-          logAnalytics("tool_call_success", {
-            responseTime,
-            params: request.params.arguments || {},
-            inferredQuery: inferredQuery.join(", "),
-            userLocation,
-            userLocale,
-            device: deviceCategory,
-          });
+            logAnalytics("tool_call_success", {
+              responseTime,
+              params: request.params.arguments || {},
+              inferredQuery: inferredQuery.join(", "),
+              userLocation,
+              userLocale,
+              device: deviceCategory,
+            });
           }
-        } catch {}
+        } catch { }
 
         // TEXT SUPPRESSION: Return empty content array to prevent ChatGPT from adding
         // any text after the widget. The widget provides all necessary UI.
@@ -788,17 +680,17 @@ function humanizeEventName(event: string): string {
 function formatEventDetails(log: AnalyticsEvent): string {
   const excludeKeys = ["timestamp", "event"];
   const details: Record<string, any> = {};
-  
+
   Object.keys(log).forEach((key) => {
     if (!excludeKeys.includes(key)) {
       details[key] = log[key];
     }
   });
-  
+
   if (Object.keys(details).length === 0) {
     return "—";
   }
-  
+
   return JSON.stringify(details, null, 0);
 }
 
@@ -911,13 +803,13 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
   const avgResponseTime =
     successLogs.length > 0
       ? (successLogs.reduce((sum, l) => sum + (l.responseTime || 0), 0) /
-          successLogs.length).toFixed(0)
+        successLogs.length).toFixed(0)
       : "N/A";
 
   const paramUsage: Record<string, number> = {};
   const tripPurposeDist: Record<string, number> = {};
   const climateDist: Record<string, number> = {};
-  
+
   successLogs.forEach((log) => {
     if (log.params) {
       Object.keys(log.params).forEach((key) => {
@@ -937,13 +829,13 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
       }
     }
   });
-  
+
   const widgetInteractions: Record<string, number> = {};
   widgetEvents.forEach((log) => {
     const humanName = humanizeEventName(log.event);
     widgetInteractions[humanName] = (widgetInteractions[humanName] || 0) + 1;
   });
-  
+
   // Trip duration distribution
   const tripDurationDist: Record<string, number> = {};
   successLogs.forEach((log) => {
@@ -980,19 +872,19 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
   const actionCounts: Record<string, number> = {
     "Generate Checklist": 0,
     "Subscribe": 0,
-    "Check Item": 0, 
+    "Check Item": 0,
     "Add Custom Item": 0,
     "Save Checklist": 0,
     "Print/Share": 0
   };
 
   widgetEvents.forEach(log => {
-      if (log.event === "widget_generate_checklist") actionCounts["Generate Checklist"]++;
-      if (log.event === "widget_notify_me_subscribe") actionCounts["Subscribe"]++;
-      if (log.event === "widget_check_item") actionCounts["Check Item"]++;
-      if (log.event === "widget_add_custom_item") actionCounts["Add Custom Item"]++;
-      if (log.event === "widget_save_checklist") actionCounts["Save Checklist"]++;
-      if (log.event === "widget_print_share") actionCounts["Print/Share"]++;
+    if (log.event === "widget_generate_checklist") actionCounts["Generate Checklist"]++;
+    if (log.event === "widget_notify_me_subscribe") actionCounts["Subscribe"]++;
+    if (log.event === "widget_check_item") actionCounts["Check Item"]++;
+    if (log.event === "widget_add_custom_item") actionCounts["Add Custom Item"]++;
+    if (log.event === "widget_save_checklist") actionCounts["Save Checklist"]++;
+    if (log.event === "widget_print_share") actionCounts["Print/Share"]++;
   });
 
   return `<!DOCTYPE html>
@@ -1000,7 +892,7 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Travel Checklist Analytics</title>
+  <title>Just Cancel Analytics</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; }
@@ -1027,22 +919,21 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
 </head>
 <body>
   <div class="container">
-    <h1>📊 Travel Checklist Analytics</h1>
+    <h1>📊 Just Cancel Analytics</h1>
     <p class="subtitle">Last 7 days • Auto-refresh every 60s</p>
     
     <div class="grid">
       <div class="card ${alerts.length ? "warning" : ""}">
         <h2>Alerts</h2>
-        ${
-          alerts.length
-            ? `<ul style="padding-left:16px;margin:0;">${alerts
-                .map(
-                  (a) =>
-                    `<li><strong>${a.level.toUpperCase()}</strong> — ${a.message}</li>`
-                )
-                .join("")}</ul>`
-            : '<p style="color:#16a34a;">No active alerts</p>'
-        }
+        ${alerts.length
+      ? `<ul style="padding-left:16px;margin:0;">${alerts
+        .map(
+          (a) =>
+            `<li><strong>${a.level.toUpperCase()}</strong> — ${a.message}</li>`
+        )
+        .join("")}</ul>`
+      : '<p style="color:#16a34a;">No active alerts</p>'
+    }
       </div>
       <div class="card success">
         <h2>Total Calls</h2>
@@ -1068,17 +959,17 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
         <thead><tr><th>Parameter</th><th>Times Used</th><th>Usage %</th></tr></thead>
         <tbody>
           ${Object.entries(paramUsage)
-            .sort((a, b) => b[1] - a[1])
-            .map(
-              ([param, count]) => `
+      .sort((a, b) => b[1] - a[1])
+      .map(
+        ([param, count]) => `
             <tr>
               <td><code>${param}</code></td>
               <td>${count}</td>
               <td>${((count / successLogs.length) * 100).toFixed(1)}%</td>
             </tr>
           `
-            )
-            .join("")}
+      )
+      .join("")}
         </tbody>
       </table>
     </div>
@@ -1090,16 +981,16 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
           <thead><tr><th>Purpose</th><th>Count</th></tr></thead>
           <tbody>
             ${Object.entries(tripPurposeDist).length > 0 ? Object.entries(tripPurposeDist)
-              .sort((a, b) => (b[1] as number) - (a[1] as number))
-              .map(
-                ([purpose, count]) => `
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .map(
+        ([purpose, count]) => `
               <tr>
                 <td>${purpose}</td>
                 <td>${count}</td>
               </tr>
             `
-              )
-              .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -1110,16 +1001,16 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
           <thead><tr><th>Action</th><th>Count</th></tr></thead>
           <tbody>
             ${Object.entries(actionCounts)
-              .sort((a, b) => b[1] - a[1])
-              .map(
-                ([action, count]) => `
+      .sort((a, b) => b[1] - a[1])
+      .map(
+        ([action, count]) => `
               <tr>
                 <td>${action}</td>
                 <td>${count}</td>
               </tr>
             `
-              )
-              .join("")}
+      )
+      .join("")}
           </tbody>
         </table>
       </div>
@@ -1132,16 +1023,16 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
         <thead><tr><th>Action</th><th>Count</th></tr></thead>
         <tbody>
           ${Object.entries(widgetInteractions).length > 0 ? Object.entries(widgetInteractions)
-            .sort((a, b) => b[1] - a[1])
-            .map(
-              ([action, count]) => `
+      .sort((a, b) => b[1] - a[1])
+      .map(
+        ([action, count]) => `
             <tr>
               <td>${action}</td>
               <td>${count}</td>
             </tr>
           `
-            )
-            .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -1153,16 +1044,16 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
           <thead><tr><th>Duration</th><th>Users</th></tr></thead>
           <tbody>
             ${Object.entries(tripDurationDist).length > 0 ? Object.entries(tripDurationDist)
-              .sort((a, b) => (b[1] as number) - (a[1] as number))
-              .map(
-                ([duration, count]) => `
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .map(
+        ([duration, count]) => `
               <tr>
                 <td>${duration}</td>
                 <td>${count}</td>
               </tr>
             `
-              )
-              .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -1173,16 +1064,16 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
           <thead><tr><th>Type</th><th>Users</th></tr></thead>
           <tbody>
             ${Object.entries(tripTypeDist).length > 0 ? Object.entries(tripTypeDist)
-              .sort((a, b) => (b[1] as number) - (a[1] as number))
-              .map(
-                ([tripType, count]) => `
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .map(
+        ([tripType, count]) => `
               <tr>
                 <td>${tripType}</td>
                 <td>${count}</td>
               </tr>
             `
-              )
-              .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -1193,17 +1084,17 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
           <thead><tr><th>Destination</th><th>Users</th></tr></thead>
           <tbody>
             ${Object.entries(destinationDist).length > 0 ? Object.entries(destinationDist)
-              .sort((a, b) => (b[1] as number) - (a[1] as number))
-              .slice(0, 10)
-              .map(
-                ([dest, count]) => `
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .slice(0, 10)
+      .map(
+        ([dest, count]) => `
               <tr>
                 <td>${dest}</td>
                 <td>${count}</td>
               </tr>
             `
-              )
-              .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No data yet</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -1215,9 +1106,9 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
         <thead><tr><th>Date</th><th>Query</th><th>Location</th><th>Locale</th></tr></thead>
         <tbody>
           ${successLogs.length > 0 ? successLogs
-            .slice(0, 20)
-            .map(
-              (log) => `
+      .slice(0, 20)
+      .map(
+        (log) => `
             <tr>
               <td class="timestamp" style="white-space: nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
               <td style="max-width: 400px;">${log.inferredQuery || "general search"}</td>
@@ -1225,8 +1116,8 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
               <td style="font-size: 12px; color: #6b7280;">${log.userLocale || '—'}</td>
             </tr>
           `
-            )
-            .join("") : '<tr><td colspan="4" style="text-align: center; color: #9ca3af;">No queries yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="4" style="text-align: center; color: #9ca3af;">No queries yet</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -1237,17 +1128,17 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
         <thead><tr><th>Date</th><th>Feedback</th></tr></thead>
         <tbody>
           ${logs.filter(l => l.event === "widget_user_feedback").length > 0 ? logs
-            .filter(l => l.event === "widget_user_feedback")
-            .slice(0, 20)
-            .map(
-              (log) => `
+      .filter(l => l.event === "widget_user_feedback")
+      .slice(0, 20)
+      .map(
+        (log) => `
             <tr>
               <td class="timestamp" style="white-space: nowrap;">${new Date(log.timestamp).toLocaleString()}</td>
               <td style="max-width: 600px;">${log.feedback || "—"}</td>
             </tr>
           `
-            )
-            .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No feedback yet</td></tr>'}
+      )
+      .join("") : '<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No feedback yet</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -1258,17 +1149,17 @@ function generateAnalyticsDashboard(logs: AnalyticsEvent[], alerts: AlertEntry[]
         <thead><tr><th>Time</th><th>Event</th><th>Details</th></tr></thead>
         <tbody>
           ${logs
-            .slice(0, 50)
-            .map(
-              (log) => `
+      .slice(0, 50)
+      .map(
+        (log) => `
             <tr class="${log.event.includes("error") ? "error-row" : ""}">
               <td class="timestamp">${new Date(log.timestamp).toLocaleString()}</td>
               <td><strong>${humanizeEventName(log.event)}</strong></td>
               <td style="font-size: 12px; max-width: 600px; overflow: hidden; text-overflow: ellipsis;">${formatEventDetails(log)}</td>
             </tr>
           `
-            )
-            .join("")}
+      )
+      .join("")}
         </tbody>
       </table>
     </div>
@@ -1343,7 +1234,7 @@ async function handleTrackEvent(req: IncomingMessage, res: ServerResponse) {
 // Buttondown API integration
 async function subscribeToButtondown(email: string, topicId: string, topicName: string) {
   const BUTTONDOWN_API_KEY = process.env.BUTTONDOWN_API_KEY;
-  
+
   console.log("[Buttondown] subscribeToButtondown called", { email, topicId, topicName });
   console.log("[Buttondown] API key present:", !!BUTTONDOWN_API_KEY, "length:", BUTTONDOWN_API_KEY?.length ?? 0);
 
@@ -1353,7 +1244,7 @@ async function subscribeToButtondown(email: string, topicId: string, topicName: 
 
   const metadata: Record<string, any> = {
     topicName,
-    source: "travel-checklist",
+    source: "just-cancel",
     subscribedAt: new Date().toISOString(),
   };
 
@@ -1379,7 +1270,7 @@ async function subscribeToButtondown(email: string, topicId: string, topicName: 
   if (!response.ok) {
     const errorText = await response.text();
     let errorMessage = "Failed to subscribe";
-    
+
     try {
       const errorData = JSON.parse(errorText);
       if (errorData.detail) {
@@ -1390,7 +1281,7 @@ async function subscribeToButtondown(email: string, topicId: string, topicName: 
     } catch {
       errorMessage = errorText;
     }
-    
+
     throw new Error(errorMessage);
   }
 
@@ -1400,7 +1291,7 @@ async function subscribeToButtondown(email: string, topicId: string, topicName: 
 // Update existing subscriber with new topic
 async function updateButtondownSubscriber(email: string, topicId: string, topicName: string) {
   const BUTTONDOWN_API_KEY = process.env.BUTTONDOWN_API_KEY;
-  
+
   if (!BUTTONDOWN_API_KEY) {
     throw new Error("BUTTONDOWN_API_KEY not set in environment variables");
   }
@@ -1439,11 +1330,11 @@ async function updateButtondownSubscriber(email: string, topicId: string, topicN
     name: topicName,
     subscribedAt: new Date().toISOString(),
   });
-  
+
   const updatedMetadata = {
     ...existingMetadata,
     [topicKey]: topicData,
-    source: "travel-checklist",
+    source: "just-cancel",
   };
 
   const updateRequestBody = {
@@ -1498,8 +1389,8 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
     // Support both old (settlementId/settlementName) and new (topicId/topicName) field names
     const parsed = JSON.parse(body);
     const email = parsed.email;
-    const topicId = parsed.topicId || parsed.settlementId || "travel-checklist";
-    const topicName = parsed.topicName || parsed.settlementName || "Travel Checklist Updates";
+    const topicId = parsed.topicId || parsed.settlementId || "just-cancel";
+    const topicName = parsed.topicName || parsed.settlementName || "Just Cancel Updates";
     if (!email || !email.includes("@")) {
       res.writeHead(400).end(JSON.stringify({ error: "Invalid email address" }));
       return;
@@ -1513,9 +1404,9 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
 
     try {
       await subscribeToButtondown(email, topicId, topicName);
-      res.writeHead(200).end(JSON.stringify({ 
-        success: true, 
-        message: "Successfully subscribed! You'll receive travel tips and packing list updates." 
+      res.writeHead(200).end(JSON.stringify({
+        success: true,
+        message: "Successfully subscribed! You'll receive travel tips and packing list updates."
       }));
     } catch (subscribeError: any) {
       const rawMessage = String(subscribeError?.message ?? "").trim();
@@ -1526,9 +1417,9 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
         console.log("Subscriber already on list, attempting update", { email, topicId, message: rawMessage });
         try {
           await updateButtondownSubscriber(email, topicId, topicName);
-          res.writeHead(200).end(JSON.stringify({ 
-            success: true, 
-            message: "You're now subscribed to this topic!" 
+          res.writeHead(200).end(JSON.stringify({
+            success: true,
+            message: "You're now subscribed to this topic!"
           }));
         } catch (updateError: any) {
           console.warn("Update subscriber failed, returning graceful success", {
@@ -1565,15 +1456,15 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
       email: undefined,
       error: error.message || "unknown_error",
     });
-    res.writeHead(500).end(JSON.stringify({ 
-      error: error.message || "Failed to subscribe. Please try again." 
+    res.writeHead(500).end(JSON.stringify({
+      error: error.message || "Failed to subscribe. Please try again."
     }));
   }
 }
 
 async function handleSseRequest(res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  const server = createTravelChecklistServer();
+  const server = createJustCancelServer();
   const transport = new SSEServerTransport(postPath, res);
   const sessionId = transport.sessionId;
 
@@ -1693,8 +1584,8 @@ const httpServer = createServer(
     }
 
     // Serve alias for legacy loader path -> our main widget HTML
-    if (req.method === "GET" && url.pathname === "/assets/travel-checklist.html") {
-      const mainAssetPath = path.join(ASSETS_DIR, "travel-checklist.html");
+    if (req.method === "GET" && url.pathname === "/assets/just-cancel.html") {
+      const mainAssetPath = path.join(ASSETS_DIR, "just-cancel.html");
       console.log(`[Debug Legacy] Request: ${url.pathname}, Main Path: ${mainAssetPath}, Exists: ${fs.existsSync(mainAssetPath)}`);
       if (fs.existsSync(mainAssetPath) && fs.statSync(mainAssetPath).isFile()) {
         res.writeHead(200, {
@@ -1724,7 +1615,7 @@ const httpServer = createServer(
           ".svg": "image/svg+xml"
         };
         const contentType = contentTypeMap[ext] || "application/octet-stream";
-        res.writeHead(200, { 
+        res.writeHead(200, {
           "Content-Type": contentType,
           "Access-Control-Allow-Origin": "*",
           "Cache-Control": "no-cache"
@@ -1750,7 +1641,7 @@ function startMonitoring() {
     try {
       const logs = getRecentLogs(7);
       const alerts = evaluateAlerts(logs);
-      
+
       if (alerts.length > 0) {
         console.log("\n=== 🚨 ACTIVE ALERTS 🚨 ===");
         alerts.forEach(alert => {
@@ -1766,7 +1657,7 @@ function startMonitoring() {
 
 httpServer.listen(port, () => {
   startMonitoring();
-  console.log(`Travel Checklist MCP server listening on http://localhost:${port}`);
+  console.log(`Just Cancel MCP server listening on http://localhost:${port}`);
   console.log(`  SSE stream: GET http://localhost:${port}${ssePath}`);
   console.log(
     `  Message post endpoint: POST http://localhost:${port}${postPath}?sessionId=...`

@@ -1,14 +1,14 @@
 {
-  "name": "travel-checklist-mcp-node",
+  "name": "just-cancel-mcp-node",
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "description": "Smart Travel Checklist — generate personalized, customizable packing lists based on your trip profile.",
+  "description": "Just Cancel — discover which subscriptions you should cancel to save money.",
   "keywords": [
-    "travel checklist",
-    "packing list",
-    "travel planner",
-    "vacation"
+    "subscription management",
+    "cancel subscriptions",
+    "money saving",
+    "budget helper"
   ],
   "scripts": {
     "start": "tsx src/server.ts",

@@ -11,8 +11,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const htmlPath = path.join(__dirname, '../assets/travel-checklist.html');
-const jsPath = path.join(__dirname, '../assets/travel-checklist.js');
+const htmlPath = path.join(__dirname, '../assets/just-cancel.html');
+const jsPath = path.join(__dirname, '../assets/just-cancel.js');
 
 console.log('[Inline Bundle] Reading files...');
 const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
@@ -34,10 +34,10 @@ const inlineScript = `
       const url = URL.createObjectURL(blob);
       import(url)
         .catch(err => {
-          console.error('[Travel Checklist] Failed to load:', err);
-          const root = document.getElementById('travel-checklist-root');
+          console.error('[Just Cancel] Failed to load:', err);
+          const root = document.getElementById('just-cancel-root');
           if (root) {
-            root.innerHTML = '<div style="padding:20px;text-align:center;font-family:sans-serif;color:#DC2626"><h3>Failed to load checklist</h3><p>Please refresh the page.</p></div>';
+            root.innerHTML = '<div style="padding:20px;text-align:center;font-family:sans-serif;color:#DC2626"><h3>Failed to load subscription analyzer</h3><p>Please refresh the page.</p></div>';
           }
         });
     </script>`;

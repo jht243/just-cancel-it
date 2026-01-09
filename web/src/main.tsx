@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import TravelChecklist from "./TravelChecklist";
+import JustCancel from "./JustCancel";
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -20,20 +20,20 @@ class ErrorBoundary extends React.Component<
     console.error("Widget Error Boundary caught error:", error, errorInfo);
     // Log to server
     try {
-        fetch("/api/track", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                event: "crash",
-                data: {
-                    error: error?.message || "Unknown error",
-                    stack: error?.stack,
-                    componentStack: errorInfo?.componentStack
-                }
-            })
-        }).catch(e => console.error("Failed to report crash", e));
+      fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "crash",
+          data: {
+            error: error?.message || "Unknown error",
+            stack: error?.stack,
+            componentStack: errorInfo?.componentStack
+          }
+        })
+      }).catch(e => console.error("Failed to report crash", e));
     } catch (e) {
-        // Ignore reporting errors
+      // Ignore reporting errors
     }
   }
 
@@ -73,13 +73,13 @@ interface OpenAIGlobals {
 // Hydration Helper
 const getHydrationData = (): any => {
   console.log("[Hydration] Starting hydration check...");
-  
+
   // Check for window.openai
   if (typeof window === 'undefined') {
     console.log("[Hydration] Window is undefined");
     return {};
   }
-  
+
   const oa = (window as any).openai as OpenAIGlobals;
   if (!oa) {
     console.log("[Hydration] window.openai not found, rendering with defaults");
@@ -102,23 +102,23 @@ const getHydrationData = (): any => {
       return candidate;
     }
   }
-  
+
   console.log("[Hydration] No data found in any candidate source");
   return {};
 };
 
-console.log("[Main] Travel Checklist main.tsx loading...");
+console.log("[Main] Just Cancel main.tsx loading...");
 
-// App wrapper - Travel Checklist
+// App wrapper - Just Cancel
 function App({ initialData }: { initialData: any }) {
-  return <TravelChecklist initialData={initialData} />;
+  return <JustCancel initialData={initialData} />;
 }
 
 // Get initial data
-const container = document.getElementById("travel-checklist-root");
+const container = document.getElementById("just-cancel-root") || document.getElementById("travel-checklist-root");
 
 if (!container) {
-  throw new Error("travel-checklist-root element not found");
+  throw new Error("just-cancel-root element not found");
 }
 
 const root = createRoot(container);
@@ -142,7 +142,7 @@ window.addEventListener('openai:set_globals', (ev: any) => {
   const globals = ev?.detail?.globals;
   if (globals) {
     console.log("[Hydration] Late event received:", globals);
-    
+
     // Extract data from the event globals similar to getHydrationData
     const candidates = [
       globals.toolOutput,
@@ -150,14 +150,14 @@ window.addEventListener('openai:set_globals', (ev: any) => {
       globals.result?.structuredContent,
       globals.toolInput
     ];
-    
+
     for (const candidate of candidates) {
-       if (candidate && typeof candidate === 'object' && Object.keys(candidate).length > 0) {
-          console.log("[Hydration] Re-rendering with late data:", candidate);
-          // Force re-mount by changing key, ensuring initialData is applied fresh
-          renderApp(candidate);
-          return;
-       }
+      if (candidate && typeof candidate === 'object' && Object.keys(candidate).length > 0) {
+        console.log("[Hydration] Re-rendering with late data:", candidate);
+        // Force re-mount by changing key, ensuring initialData is applied fresh
+        renderApp(candidate);
+        return;
+      }
     }
   }
 });
