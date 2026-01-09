@@ -50726,7 +50726,8 @@ var SUBSCRIPTION_PATTERNS = {
 
 // src/JustCancel.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-GlobalWorkerOptions.workerSrc = `pdf.worker.js`;
+var PDF_JS_VERSION = "5.4.530";
+GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}/pdf.worker.min.mjs`;
 var COLORS = {
   primary: "#56C596",
   primaryDark: "#3aa87b",
@@ -50850,6 +50851,9 @@ var extractTextFromPDF = async (fileData) => {
   try {
     const pdf = await getDocument({ data: fileData }).promise;
     let fullText = "";
+    if (pdf.numPages === 0) {
+      return { text: "", error: "PDF has no pages." };
+    }
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
@@ -50866,10 +50870,10 @@ var extractTextFromPDF = async (fileData) => {
       }
       fullText += pageText + "\n";
     }
-    return fullText;
+    return { text: fullText };
   } catch (e) {
     console.error("PDF Parse Error", e);
-    return "";
+    return { text: "", error: e?.message || "Unknown PDF parsing error" };
   }
 };
 var WALL_OF_SAVINGS_DATA = [
@@ -50974,10 +50978,13 @@ function JustCancel({ initialData: initialData2 }) {
     setAnalysisStep("Reading file...");
     await new Promise((r) => setTimeout(r, 1500));
     let content = "";
+    let extractionError = "";
     if (file.type.includes("pdf")) {
       setAnalysisStep("Extracting text from PDF...");
       const arrayBuffer = await file.arrayBuffer();
-      content = await extractTextFromPDF(arrayBuffer);
+      const result = await extractTextFromPDF(arrayBuffer);
+      content = result.text;
+      extractionError = result.error || "";
     } else {
       content = await file.text();
     }
@@ -51005,7 +51012,9 @@ function JustCancel({ initialData: initialData2 }) {
         manualSubscriptions: mergedList,
         totalMonthlySpend: newTotal,
         isAnalyzing: false,
-        analysisComplete: true
+        analysisComplete: true,
+        extractedText: content,
+        parsingError: extractionError
       };
     });
     trackEvent("analysis_complete", { fileName: file.name, subscriptionCount: newSubscriptions.length });
@@ -51545,7 +51554,10 @@ function JustCancel({ initialData: initialData2 }) {
             "No subscriptions found in this category.",
             profile.fileType === "pdf" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: 20, padding: 10, background: "#f5f5f5", borderRadius: 8, fontSize: 11, textAlign: "left" }, children: [
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Debug: Raw Text Extracted" }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("pre", { style: { whiteSpace: "pre-wrap", maxHeight: 100, overflow: "auto", marginTop: 5 }, children: "(If this area is empty, PDF parsing failed. If text is visible but no subs found, regex didn't match.)" })
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("pre", { style: { whiteSpace: "pre-wrap", maxHeight: 100, overflow: "auto", marginTop: 5 }, children: profile.parsingError ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { style: { color: COLORS.red }, children: [
+                "\u26A0\uFE0F Error: ",
+                profile.parsingError
+              ] }) : profile.extractedText ? profile.extractedText : "(If this area is empty, PDF parsing failed or no text was found. Check the console for worker load errors.)" })
             ] })
           ] }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", gap: 12, marginTop: 8 }, children: !showManualInput ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [

@@ -8,8 +8,10 @@ import {
 import * as pdfjsLib from 'pdfjs-dist';
 import { SUBSCRIPTION_PATTERNS } from "./data/subscriptions";
 
-// Initialize PDF.js worker with LOCAL file to avoid CDN/Version issues
-pdfjsLib.GlobalWorkerOptions.workerSrc = `pdf.worker.js`;
+// Initialize PDF.js worker with CDN to ensure it works in hosted environments like ChatGPT
+// Using version-matched worker from cdnjs
+const PDF_JS_VERSION = '5.4.530';
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}/pdf.worker.min.mjs`;
 
 const COLORS = {
   primary: "#56C596", primaryDark: "#3aa87b", bg: "#FAFAFA", card: "#FFFFFF",
@@ -42,6 +44,8 @@ interface SubscriptionProfile {
   viewFilter: "all" | "approved" | "cancelling" | "keeping" | "investigating" | "confirmed_subscription" | "not_subscription" | "unknown";
   isAnalyzing: boolean;
   analysisComplete: boolean;
+  extractedText?: string;
+  parsingError?: string;
 }
 
 const DEFAULT_PROFILE: SubscriptionProfile = {
@@ -162,10 +166,14 @@ const parseTextForSubscriptions = (text: string): SubscriptionItem[] => {
   return Object.values(foundSubscriptions);
 };
 
-const extractTextFromPDF = async (fileData: ArrayBuffer): Promise<string> => {
+const extractTextFromPDF = async (fileData: ArrayBuffer): Promise<{ text: string, error?: string }> => {
   try {
     const pdf = await pdfjsLib.getDocument({ data: fileData }).promise;
     let fullText = "";
+
+    if (pdf.numPages === 0) {
+      return { text: "", error: "PDF has no pages." };
+    }
 
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
@@ -192,10 +200,10 @@ const extractTextFromPDF = async (fileData: ArrayBuffer): Promise<string> => {
       }
       fullText += pageText + "\n";
     }
-    return fullText;
-  } catch (e) {
+    return { text: fullText };
+  } catch (e: any) {
     console.error("PDF Parse Error", e);
-    return "";
+    return { text: "", error: e?.message || "Unknown PDF parsing error" };
   }
 };
 
@@ -314,10 +322,14 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     await new Promise(r => setTimeout(r, 1500));
 
     let content = "";
+    let extractionError = "";
+
     if (file.type.includes("pdf")) {
       setAnalysisStep("Extracting text from PDF...");
       const arrayBuffer = await file.arrayBuffer();
-      content = await extractTextFromPDF(arrayBuffer);
+      const result = await extractTextFromPDF(arrayBuffer);
+      content = result.text;
+      extractionError = result.error || "";
     } else {
       content = await file.text();
     }
@@ -357,7 +369,9 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
         manualSubscriptions: mergedList,
         totalMonthlySpend: newTotal,
         isAnalyzing: false,
-        analysisComplete: true
+        analysisComplete: true,
+        extractedText: content,
+        parsingError: extractionError
       };
     });
 
@@ -834,10 +848,13 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
                   <div style={{ marginTop: 20, padding: 10, background: "#f5f5f5", borderRadius: 8, fontSize: 11, textAlign: "left" }}>
                     <strong>Debug: Raw Text Extracted</strong>
                     <pre style={{ whiteSpace: "pre-wrap", maxHeight: 100, overflow: "auto", marginTop: 5 }}>
-                      {/* We need to expose the raw text to state ideally, but for now let's just show a message.
-                           Actually, to show the text we need to store it in profile.
-                       */}
-                      (If this area is empty, PDF parsing failed. If text is visible but no subs found, regex didn't match.)
+                      {profile.parsingError ? (
+                        <span style={{ color: COLORS.red }}>⚠️ Error: {profile.parsingError}</span>
+                      ) : profile.extractedText ? (
+                        profile.extractedText
+                      ) : (
+                        "(If this area is empty, PDF parsing failed or no text was found. Check the console for worker load errors.)"
+                      )}
                     </pre>
                   </div>
                 )}
