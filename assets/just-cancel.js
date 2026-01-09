@@ -50937,6 +50937,16 @@ var ShareButton = ({ savings }) => {
 };
 function JustCancel({ initialData: initialData2 }) {
   const [profile, setProfile] = (0, import_react3.useState)(() => {
+    if (initialData2 && (initialData2.subscriptions && initialData2.subscriptions.length > 0 || initialData2.total_monthly_spend && initialData2.total_monthly_spend > 0)) {
+      console.log("[Just Cancel] Hydrating from OpenAI tool data:", initialData2);
+      return {
+        ...DEFAULT_PROFILE,
+        manualSubscriptions: initialData2.subscriptions || [],
+        totalMonthlySpend: initialData2.total_monthly_spend || 0,
+        analysisComplete: true,
+        analysisInProgress: false
+      };
+    }
     if (typeof sessionStorage !== "undefined" && sessionStorage.getItem("JUST_CANCEL_FORCE_RESET")) {
       sessionStorage.removeItem("JUST_CANCEL_FORCE_RESET");
       console.log("[Just Cancel] Forced reset - returning to landing page.");

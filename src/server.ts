@@ -42,6 +42,9 @@ type JustCancelWidget = {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Resolve project root: prefer ASSETS_ROOT only if it actually has an assets/ directory
+import { SUBSCRIPTION_PATTERNS } from "./subscription_data.js";
+
+const DEFAULT_PORT = 3333;
 const DEFAULT_ROOT_DIR = path.resolve(__dirname, "..");
 const ROOT_DIR = (() => {
   const envRoot = process.env.ASSETS_ROOT;
@@ -70,6 +73,16 @@ type AnalyticsEvent = {
   timestamp: string;
   event: string;
   [key: string]: any;
+};
+
+type SubscriptionItem = {
+  id: string;
+  service: string;
+  monthlyCost: number;
+  category: string;
+  status: "confirmed_subscription" | "potential_subscription";
+  logo?: string;
+  count: number;
 };
 
 function logAnalytics(event: string, data: Record<string, any> = {}) {
@@ -109,6 +122,48 @@ function getRecentLogs(days: number = 7): AnalyticsEvent[] {
   }
 
   return logs.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+}
+
+function parseTextForSubscriptions(text: string): SubscriptionItem[] {
+  const lines = text.split(/\r?\n/);
+  const foundSubscriptions: Record<string, SubscriptionItem> = {};
+
+  lines.forEach((line) => {
+    if (line.length < 5) return;
+    const lowerLine = line.toLowerCase();
+
+    Object.values(SUBSCRIPTION_PATTERNS).forEach(pattern => {
+      if (pattern.regex.test(lowerLine)) {
+        const priceMatch = line.match(/(\d+\.\d{2})/);
+        let cost = 0;
+        if (priceMatch) {
+          cost = parseFloat(priceMatch[0]);
+        } else {
+          if (pattern.name === "Netflix") cost = 15.49;
+          if (pattern.name === "Spotify") cost = 11.99;
+          if (pattern.name === "ChatGPT") cost = 20.00;
+        }
+
+        const existing = foundSubscriptions[pattern.name];
+        if (existing) {
+          existing.count = (existing.count || 1) + 1;
+          if (existing.monthlyCost === 0 && cost > 0) existing.monthlyCost = cost;
+        } else {
+          foundSubscriptions[pattern.name] = {
+            id: `sub-${Math.random().toString(36).substr(2, 9)}`,
+            service: pattern.name,
+            monthlyCost: cost > 0 ? cost : 0,
+            status: "confirmed_subscription",
+            category: pattern.category,
+            logo: pattern.logo,
+            count: 1
+          };
+        }
+      }
+    });
+  });
+
+  return Object.values(foundSubscriptions);
 }
 
 function classifyDevice(userAgent?: string | null): string {
@@ -234,23 +289,21 @@ function widgetMeta(widget: JustCancelWidget, bustCache: boolean = false) {
       "Show me subscriptions I rarely use",
       "Help me cut my monthly expenses",
     ],
-    "openai/widgetPrefersBorder": true,
+    "openai/widgetAccessible": true,
+    "openai/resultCanProduceWidget": true,
     "openai/widgetCSP": {
       connect_domains: [
-        "https://just-cancel.onrender.com",
+        "https://just-cancel-it.onrender.com",
+        "https://cdnjs.cloudflare.com",
         "https://nominatim.openstreetmap.org",
         "https://api.open-meteo.com",
         "https://geocoding-api.open-meteo.com"
       ],
       resource_domains: [
-        "https://just-cancel.onrender.com"
+        "https://just-cancel-it.onrender.com",
+        "https://cdnjs.cloudflare.com"
       ],
     },
-    "openai/widgetDomain": "https://web-sandbox.oaiusercontent.com",
-    "openai/toolInvocation/invoking": widget.invoking,
-    "openai/toolInvocation/invoked": widget.invoked,
-    "openai/widgetAccessible": true,
-    "openai/resultCanProduceWidget": true,
   } as const;
 }
 
@@ -282,6 +335,7 @@ const toolInputSchema = {
     subscriptions: { type: "array", items: { type: "object", properties: { service: { type: "string" }, monthly_cost: { type: "number" }, category: { type: "string" } } }, description: "Manually entered subscriptions if known." },
     total_monthly_spend: { type: "number", description: "Total monthly subscription spending if known." },
     view_filter: { type: "string", enum: ["all", "cancelling", "keeping", "investigating"], description: "Which subscriptions to show." },
+    statement_text: { type: "string", description: "The raw text of a bank statement or list of transactions to analyze for subscriptions." },
   },
   required: [],
   additionalProperties: false,
@@ -296,6 +350,7 @@ const toolInputParser = z.object({
   })).optional(),
   total_monthly_spend: z.number().optional(),
   view_filter: z.enum(["all", "cancelling", "keeping", "investigating"]).optional(),
+  statement_text: z.string().optional(),
 });
 
 const tools: Tool[] = widgets.map((widget) => ({

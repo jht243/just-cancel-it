@@ -262,6 +262,21 @@ const ShareButton = ({ savings }: { savings: number }) => {
 
 export default function JustCancel({ initialData }: { initialData?: any }) {
   const [profile, setProfile] = useState<SubscriptionProfile>(() => {
+    // 0. Hydration from OpenAI (Server-side parsed data)
+    if (initialData && (
+      (initialData.subscriptions && initialData.subscriptions.length > 0) ||
+      (initialData.total_monthly_spend && initialData.total_monthly_spend > 0)
+    )) {
+      console.log("[Just Cancel] Hydrating from OpenAI tool data:", initialData);
+      return {
+        ...DEFAULT_PROFILE,
+        manualSubscriptions: initialData.subscriptions || [],
+        totalMonthlySpend: initialData.total_monthly_spend || 0,
+        analysisComplete: true,
+        analysisInProgress: false
+      };
+    }
+
     // 1. Check for forced reset from "Start Over"
     if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem("JUST_CANCEL_FORCE_RESET")) {
       sessionStorage.removeItem("JUST_CANCEL_FORCE_RESET");
@@ -274,7 +289,6 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     if (saved) return saved;
 
     // 3. First time ever seeing the app? Show sample dashboard.
-    // If they haven't started an analysis, show them what it looks like.
     if (typeof localStorage !== 'undefined' && !localStorage.getItem("JUST_CANCEL_SEEN_SAMPLE")) {
       localStorage.setItem("JUST_CANCEL_SEEN_SAMPLE", "true");
       return SAMPLE_PROFILE;
