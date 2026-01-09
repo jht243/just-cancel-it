@@ -216,7 +216,7 @@ const ANALYSIS_STEPS = [
 
 const trackEvent = (event: string, data: Record<string, any> = {}) => {
   try {
-    const serverUrl = window.location.hostname === "localhost" ? "" : "https://travel-checklist-q79n.onrender.com";
+    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
     fetch(`${serverUrl}/api/track`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -226,7 +226,7 @@ const trackEvent = (event: string, data: Record<string, any> = {}) => {
 };
 
 const ShareButton = ({ savings }: { savings: number }) => {
-  const text = `Just saved $${savings.toFixed(0)}/yr with justcancel.io 🤯 Scan your bank statement to find subscriptions you forgot about.`;
+  const text = `Just saved $${savings.toFixed(0)}/yr with just-cancel-it.onrender.com 🤯 Scan your bank statement to find subscriptions you forgot about.`;
   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
   return (

@@ -50887,7 +50887,7 @@ var ANALYSIS_STEPS = [
 ];
 var trackEvent = (event, data = {}) => {
   try {
-    const serverUrl = window.location.hostname === "localhost" ? "" : "https://travel-checklist-q79n.onrender.com";
+    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
     fetch(`${serverUrl}/api/track`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -50898,7 +50898,7 @@ var trackEvent = (event, data = {}) => {
   }
 };
 var ShareButton = ({ savings }) => {
-  const text = `Just saved $${savings.toFixed(0)}/yr with justcancel.io \u{1F92F} Scan your bank statement to find subscriptions you forgot about.`;
+  const text = `Just saved $${savings.toFixed(0)}/yr with just-cancel-it.onrender.com \u{1F92F} Scan your bank statement to find subscriptions you forgot about.`;
   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
     "a",
