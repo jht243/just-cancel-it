@@ -1517,6 +1517,11 @@ async function handleSubscribe(req: IncomingMessage, res: ServerResponse) {
   }
 }
 
+async function handleHeartbeat(res: ServerResponse) {
+  res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+  res.end(JSON.stringify({ status: "alive", timestamp: new Date().toISOString() }));
+}
+
 async function handleSseRequest(res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const server = createJustCancelServer();
@@ -1633,7 +1638,12 @@ const httpServer = createServer(
       return;
     }
 
-    if (url.pathname === trackEventPath) {
+    if (url.pathname === "/api/heartbeat") {
+      await handleHeartbeat(res);
+      return;
+    }
+
+    if (url.pathname === "/api/track" && req.method === "POST") {
       await handleTrackEvent(req, res);
       return;
     }

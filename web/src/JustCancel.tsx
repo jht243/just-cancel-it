@@ -317,6 +317,24 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     saveData(profile);
   }, [profile]);
 
+  // Heartbeat Mechanism (Prevent session timeout)
+  useEffect(() => {
+    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+    const ping = () => {
+      fetch(`${serverUrl}/api/heartbeat`)
+        .then(res => res.json())
+        .then(data => console.log("[Heartbeat] Pulse received:", data.timestamp))
+        .catch(err => console.error("[Heartbeat] Pulse failed:", err));
+    };
+
+    // Initial ping
+    ping();
+
+    // Set interval for every 30 seconds
+    const interval = setInterval(ping, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   // File Upload Handlers
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();

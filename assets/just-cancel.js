@@ -50974,6 +50974,15 @@ function JustCancel({ initialData: initialData2 }) {
   (0, import_react3.useEffect)(() => {
     saveData(profile);
   }, [profile]);
+  (0, import_react3.useEffect)(() => {
+    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+    const ping = () => {
+      fetch(`${serverUrl}/api/heartbeat`).then((res) => res.json()).then((data) => console.log("[Heartbeat] Pulse received:", data.timestamp)).catch((err) => console.error("[Heartbeat] Pulse failed:", err));
+    };
+    ping();
+    const interval = setInterval(ping, 3e4);
+    return () => clearInterval(interval);
+  }, []);
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
