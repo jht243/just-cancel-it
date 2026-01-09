@@ -11,7 +11,7 @@ import { SUBSCRIPTION_PATTERNS } from "./data/subscriptions";
 // Initialize PDF.js worker with CDN to ensure it works in hosted environments like ChatGPT
 // Using version-matched worker from cdnjs
 const PDF_JS_VERSION = '5.4.530';
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.mjs";
 
 const COLORS = {
   primary: "#56C596", primaryDark: "#3aa87b", bg: "#FAFAFA", card: "#FFFFFF",
@@ -166,6 +166,8 @@ const parseTextForSubscriptions = (text: string): SubscriptionItem[] => {
   return Object.values(foundSubscriptions);
 };
 
+const getServerUrl = () => window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+
 const extractTextFromPDF = async (fileData: ArrayBuffer): Promise<{ text: string, error?: string }> => {
   try {
     const pdf = await pdfjsLib.getDocument({ data: fileData }).promise;
@@ -178,32 +180,33 @@ const extractTextFromPDF = async (fileData: ArrayBuffer): Promise<{ text: string
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
-
-      // Basic text extraction: join items with space, but try to respect newlines based on Y position?
-      // For simplicity in this v1, we'll just join with newlines if the Y transform changes significantly
-      // Actually, standard PDF text extract often just dumps strings.
-      // Let's dump strings separated by spaces, but try to insert newlines for large gaps.
-      // Or simply: join all strings with " ". The regex parser works on lines, so we try to reconstruct lines.
-
-      let lastY = -1;
-      let pageText = "";
-
-      for (const item of textContent.items as any[]) {
-        if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
-          pageText += "\n";
-        } else if (pageText.length > 0 && !pageText.endsWith("\n")) {
-          pageText += " "; // Space between words on same line
-        }
-
-        pageText += item.str;
-        lastY = item.transform[5];
-      }
+      const pageText = textContent.items.map((item: any) => item.str).join(" ");
       fullText += pageText + "\n";
     }
     return { text: fullText };
   } catch (e: any) {
-    console.error("PDF Parse Error", e);
-    return { text: "", error: e?.message || "Unknown PDF parsing error" };
+    console.warn("[Just Cancel] Client-side PDF Parse failed, trying server fallback...", e);
+
+    // Server-side fallback
+    try {
+      const serverUrl = getServerUrl();
+      const base64 = btoa(new Uint8Array(fileData).reduce((data, byte) => data + String.fromCharCode(byte), ""));
+      const response = await fetch(`${serverUrl}/api/extract-pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64 })
+      });
+
+      const result = await response.json();
+      if (result.text) {
+        console.log("[Just Cancel] Server-side extraction successful.");
+        return { text: result.text };
+      }
+      throw new Error(result.error || "Server extraction returned no text");
+    } catch (fallbackError: any) {
+      console.error("[Just Cancel] Both client and server extraction failed.", fallbackError);
+      return { text: "", error: `PDF extraction failed: ${fallbackError.message}` };
+    }
   }
 };
 
@@ -224,7 +227,7 @@ const ANALYSIS_STEPS = [
 
 const trackEvent = (event: string, data: Record<string, any> = {}) => {
   try {
-    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+    const serverUrl = getServerUrl();
     fetch(`${serverUrl}/api/track`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -319,7 +322,7 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
 
   // Heartbeat Mechanism (Prevent session timeout)
   useEffect(() => {
-    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+    const serverUrl = getServerUrl();
     const ping = () => {
       fetch(`${serverUrl}/api/heartbeat`)
         .then(res => res.json())

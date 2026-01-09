@@ -11,6 +11,8 @@ import dotenv from "dotenv";
 // Load environment variables from .env file
 dotenv.config();
 
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import {
@@ -1522,6 +1524,36 @@ async function handleHeartbeat(res: ServerResponse) {
   res.end(JSON.stringify({ status: "alive", timestamp: new Date().toISOString() }));
 }
 
+async function handleExtractPdf(req: IncomingMessage, res: ServerResponse) {
+  let body = "";
+  req.on("data", (chunk) => (body += chunk));
+  req.on("end", async () => {
+    try {
+      const { base64 } = JSON.parse(body);
+      if (!base64) throw new Error("Missing base64 data");
+
+      const buffer = Buffer.from(base64, "base64");
+      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
+      const pdf = await loadingTask.promise;
+      let fullText = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(" ");
+        fullText += pageText + "\n";
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+      res.end(JSON.stringify({ text: fullText }));
+    } catch (error: any) {
+      console.error("Server-side PDF extraction failed:", error);
+      res.writeHead(500, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+      res.end(JSON.stringify({ error: error.message || "Extraction failed" }));
+    }
+  });
+}
+
 async function handleSseRequest(res: ServerResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const server = createJustCancelServer();
@@ -1640,6 +1672,11 @@ const httpServer = createServer(
 
     if (url.pathname === "/api/heartbeat") {
       await handleHeartbeat(res);
+      return;
+    }
+
+    if (url.pathname === "/api/extract-pdf" && req.method === "POST") {
+      await handleExtractPdf(req, res);
       return;
     }
 

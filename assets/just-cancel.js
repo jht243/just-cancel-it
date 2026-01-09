@@ -50726,8 +50726,7 @@ var SUBSCRIPTION_PATTERNS = {
 
 // src/JustCancel.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-var PDF_JS_VERSION = "5.4.530";
-GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}/pdf.worker.min.mjs`;
+GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.mjs";
 var COLORS = {
   primary: "#56C596",
   primaryDark: "#3aa87b",
@@ -50847,6 +50846,7 @@ var parseTextForSubscriptions = (text) => {
   });
   return Object.values(foundSubscriptions);
 };
+var getServerUrl = () => window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
 var extractTextFromPDF = async (fileData) => {
   try {
     const pdf = await getDocument({ data: fileData }).promise;
@@ -50857,23 +50857,30 @@ var extractTextFromPDF = async (fileData) => {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
-      let lastY = -1;
-      let pageText = "";
-      for (const item of textContent.items) {
-        if (lastY !== -1 && Math.abs(item.transform[5] - lastY) > 5) {
-          pageText += "\n";
-        } else if (pageText.length > 0 && !pageText.endsWith("\n")) {
-          pageText += " ";
-        }
-        pageText += item.str;
-        lastY = item.transform[5];
-      }
+      const pageText = textContent.items.map((item) => item.str).join(" ");
       fullText += pageText + "\n";
     }
     return { text: fullText };
   } catch (e) {
-    console.error("PDF Parse Error", e);
-    return { text: "", error: e?.message || "Unknown PDF parsing error" };
+    console.warn("[Just Cancel] Client-side PDF Parse failed, trying server fallback...", e);
+    try {
+      const serverUrl = getServerUrl();
+      const base64 = btoa(new Uint8Array(fileData).reduce((data, byte) => data + String.fromCharCode(byte), ""));
+      const response = await fetch(`${serverUrl}/api/extract-pdf`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64 })
+      });
+      const result = await response.json();
+      if (result.text) {
+        console.log("[Just Cancel] Server-side extraction successful.");
+        return { text: result.text };
+      }
+      throw new Error(result.error || "Server extraction returned no text");
+    } catch (fallbackError) {
+      console.error("[Just Cancel] Both client and server extraction failed.", fallbackError);
+      return { text: "", error: `PDF extraction failed: ${fallbackError.message}` };
+    }
   }
 };
 var WALL_OF_SAVINGS_DATA = [
@@ -50891,7 +50898,7 @@ var ANALYSIS_STEPS = [
 ];
 var trackEvent = (event, data = {}) => {
   try {
-    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+    const serverUrl = getServerUrl();
     fetch(`${serverUrl}/api/track`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -50975,7 +50982,7 @@ function JustCancel({ initialData: initialData2 }) {
     saveData(profile);
   }, [profile]);
   (0, import_react3.useEffect)(() => {
-    const serverUrl = window.location.hostname === "localhost" ? "" : "https://just-cancel-it.onrender.com";
+    const serverUrl = getServerUrl();
     const ping = () => {
       fetch(`${serverUrl}/api/heartbeat`).then((res) => res.json()).then((data) => console.log("[Heartbeat] Pulse received:", data.timestamp)).catch((err) => console.error("[Heartbeat] Pulse failed:", err));
     };
