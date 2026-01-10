@@ -338,6 +338,17 @@ const toolInputSchema = {
     total_monthly_spend: { type: "number", description: "Total monthly subscription spending if known." },
     view_filter: { type: "string", enum: ["all", "cancelling", "keeping", "investigating"], description: "Which subscriptions to show." },
     statement_text: { type: "string", description: "The raw text of a bank statement or list of transactions to analyze for subscriptions." },
+    // File parameter for ChatGPT Apps SDK file uploads
+    bank_statement: {
+      type: "object",
+      properties: {
+        download_url: { type: "string", description: "URL to download the file from ChatGPT" },
+        file_id: { type: "string", description: "ChatGPT file ID" },
+      },
+      required: ["download_url", "file_id"],
+      additionalProperties: false,
+      description: "Bank statement file (PDF or CSV) uploaded by the user in ChatGPT."
+    },
   },
   required: [],
   additionalProperties: false,
@@ -353,12 +364,16 @@ const toolInputParser = z.object({
   total_monthly_spend: z.number().optional(),
   view_filter: z.enum(["all", "cancelling", "keeping", "investigating"]).optional(),
   statement_text: z.string().optional(),
+  bank_statement: z.object({
+    download_url: z.string(),
+    file_id: z.string(),
+  }).optional(),
 });
 
 const tools: Tool[] = widgets.map((widget) => ({
   name: widget.id,
   description:
-    "Use this tool to analyze subscriptions and discover which ones to cancel to save money. Helps users identify underutilized or wasteful subscriptions. Call this tool immediately with NO arguments to let the user enter their subscription details manually. Only provide arguments if the user has explicitly stated them.",
+    "Use this tool to analyze subscriptions and discover which ones to cancel to save money. Helps users identify underutilized or wasteful subscriptions. If the user uploads a bank statement PDF or CSV, use the bank_statement parameter. Call this tool immediately with NO arguments to let the user enter their subscription details manually. Only provide arguments if the user has explicitly stated them.",
   inputSchema: toolInputSchema,
   outputSchema: {
     type: "object",
@@ -402,6 +417,7 @@ const tools: Tool[] = widgets.map((widget) => ({
   _meta: {
     ...widgetMeta(widget),
     "openai/visibility": "public",
+    "openai/fileParams": ["bank_statement"],
     securitySchemes: [{ type: "noauth" }],
   },
   annotations: {
@@ -562,6 +578,72 @@ function createJustCancelServer(): Server {
           console.warn("Parameter inference from meta failed", e);
         }
 
+        // Handle file uploads from ChatGPT Apps SDK
+        let parsedSubscriptions: SubscriptionItem[] = [];
+        let fileParsingError: string | null = null;
+        
+        if (args.bank_statement?.download_url) {
+          console.log("[MCP] Processing bank_statement file from ChatGPT:", args.bank_statement);
+          try {
+            // Fetch the file from ChatGPT's download_url
+            const fileResponse = await fetch(args.bank_statement.download_url);
+            if (!fileResponse.ok) {
+              throw new Error(`Failed to fetch file: ${fileResponse.status} ${fileResponse.statusText}`);
+            }
+            
+            const contentType = fileResponse.headers.get("content-type") || "";
+            const fileBuffer = await fileResponse.arrayBuffer();
+            let extractedText = "";
+            
+            if (contentType.includes("pdf") || args.bank_statement.download_url.toLowerCase().includes(".pdf")) {
+              // Parse PDF using pdfjs-dist
+              console.log("[MCP] Parsing PDF file...");
+              const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(fileBuffer) });
+              const pdf = await loadingTask.promise;
+              
+              for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map((item: any) => item.str).join(" ");
+                extractedText += pageText + "\n";
+              }
+              console.log(`[MCP] Extracted ${extractedText.length} characters from ${pdf.numPages} PDF pages`);
+            } else {
+              // Assume CSV or text file
+              console.log("[MCP] Parsing CSV/text file...");
+              extractedText = new TextDecoder().decode(fileBuffer);
+            }
+            
+            // Parse the extracted text for subscriptions
+            parsedSubscriptions = parseTextForSubscriptions(extractedText);
+            console.log(`[MCP] Found ${parsedSubscriptions.length} subscriptions from file`);
+            
+            logAnalytics("file_parse_success", {
+              file_id: args.bank_statement.file_id,
+              content_type: contentType,
+              text_length: extractedText.length,
+              subscriptions_found: parsedSubscriptions.length,
+            });
+          } catch (fileError: any) {
+            console.error("[MCP] File parsing failed:", fileError);
+            fileParsingError = fileError.message;
+            logAnalytics("file_parse_error", {
+              file_id: args.bank_statement?.file_id,
+              error: fileError.message,
+            });
+          }
+        }
+        
+        // Also parse statement_text if provided (for backwards compatibility)
+        if (args.statement_text) {
+          const textSubscriptions = parseTextForSubscriptions(args.statement_text);
+          // Merge with file-parsed subscriptions, avoiding duplicates
+          textSubscriptions.forEach(sub => {
+            if (!parsedSubscriptions.find(p => p.service.toLowerCase() === sub.service.toLowerCase())) {
+              parsedSubscriptions.push(sub);
+            }
+          });
+        }
 
         const responseTime = Date.now() - startTime;
 
@@ -600,22 +682,47 @@ function createJustCancelServer(): Server {
         const widgetMetadata = widgetMeta(widget, false);
         console.log(`[MCP] Tool called: ${request.params.name}, returning templateUri: ${(widgetMetadata as any)["openai/outputTemplate"]}`);
 
+        // Merge parsed subscriptions with any manually provided ones
+        const allSubscriptions = [
+          ...parsedSubscriptions,
+          ...(args.subscriptions || []).map(s => ({
+            id: `sub-${Math.random().toString(36).substr(2, 9)}`,
+            service: s.service,
+            monthlyCost: s.monthly_cost,
+            category: s.category || "Other",
+            status: "confirmed_subscription" as const,
+            count: 1,
+          })),
+        ];
+        
+        // Calculate total monthly spend from all subscriptions
+        const calculatedMonthlySpend = allSubscriptions.reduce((sum, s) => sum + (s.monthlyCost || 0), 0);
+        const totalMonthlySpend = args.total_monthly_spend || calculatedMonthlySpend;
+
         // Build structured content once so we can log it and return it.
         // For just-cancel, expose fields relevant to subscription details
         const structured = {
           ready: true,
           timestamp: new Date().toISOString(),
-          ...args,
-          input_source: usedDefaults ? "default" : "user",
+          subscriptions: allSubscriptions,
+          total_monthly_spend: totalMonthlySpend,
+          view_filter: args.view_filter,
+          input_source: usedDefaults ? "default" : (args.bank_statement ? "file_upload" : "user"),
+          file_parsing_error: fileParsingError,
           // Summary + follow-ups for natural language UX
-          summary: computeSummary(args),
+          summary: {
+            subscription_count: allSubscriptions.length,
+            monthly_spend: totalMonthlySpend,
+            yearly_spend: totalMonthlySpend * 12,
+            analysis_type: args.bank_statement ? "File Analysis" : "Subscription Analysis",
+          },
           suggested_followups: [
             "Which subscriptions should I cancel?",
             "How much can I save monthly?",
             "Show me my most expensive subscriptions",
             "Help me lower my monthly bills"
           ],
-        } as const;
+        };
 
         // Embed the widget resource in _meta to mirror official examples and improve hydration reliability
         const metaForReturn = {
@@ -637,7 +744,7 @@ function createJustCancelServer(): Server {
         // Log success analytics
         try {
           // Check for "empty" result - when no subscription info provided
-          const hasMainInputs = (args.subscriptions && args.subscriptions.length > 0) || args.total_monthly_spend;
+          const hasMainInputs = (args.subscriptions && args.subscriptions.length > 0) || args.total_monthly_spend || args.bank_statement || allSubscriptions.length > 0;
 
           if (!hasMainInputs) {
             logAnalytics("tool_call_empty", {

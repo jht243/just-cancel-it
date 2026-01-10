@@ -9,9 +9,9 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { SUBSCRIPTION_PATTERNS } from "./data/subscriptions";
 
 // Initialize PDF.js worker with CDN to ensure it works in hosted environments like ChatGPT
-// Using version-matched worker from cdnjs
+// Using version-matched worker from cdnjs - CDN is required for ChatGPT sandbox environment
 const PDF_JS_VERSION = '5.4.530';
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}/pdf.worker.min.mjs`;
 
 const COLORS = {
   primary: "#56C596", primaryDark: "#3aa87b", bg: "#FAFAFA", card: "#FFFFFF",

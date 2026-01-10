@@ -50726,7 +50726,8 @@ var SUBSCRIPTION_PATTERNS = {
 
 // src/JustCancel.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime(), 1);
-GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.mjs";
+var PDF_JS_VERSION = "5.4.530";
+GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDF_JS_VERSION}/pdf.worker.min.mjs`;
 var COLORS = {
   primary: "#56C596",
   primaryDark: "#3aa87b",
