@@ -667,7 +667,7 @@ const trackEventPath = "/api/track";
 const healthPath = "/health";
 const domainVerificationPath = "/.well-known/openai-apps-challenge";
 const domainVerificationToken = process.env.OPENAI_DOMAIN_VERIFICATION_TOKEN ??
-    "X1C2u_pL7rpRTEqXIorF7SPz-yc1ucHWvuIoUEEYwQE";
+    "vRC_ZwCcv_vY9u3Ovq9vgvxwG19KTHrBIwMH43O6c98";
 const ANALYTICS_PASSWORD = process.env.ANALYTICS_PASSWORD || "changeme123";
 function checkAnalyticsAuth(req) {
     const authHeader = req.headers.authorization;
@@ -1530,11 +1530,6 @@ const httpServer = createServer(async (req, res) => {
     }
     if (url.pathname === "/api/track" && req.method === "POST") {
         await handleTrackEvent(req, res);
-        return;
-    }
-    if (url.pathname === "/.well-known/openai-apps-challenge") {
-        res.writeHead(200, { "Content-Type": "text/plain" });
-        res.end("vRC_ZwCcv_vY9u3Ovq9vgvxwG19KTHrBIwMH43O6c98");
         return;
     }
     // Serve alias for legacy loader path -> our main widget HTML
