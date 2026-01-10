@@ -322,6 +322,25 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     setProfile(DEFAULT_PROFILE);
   };
 
+  const openFeedback = () => {
+    const url = "mailto:hello@justcancel.io";
+    try {
+      const oa = (window as any).openai;
+      if (oa && typeof oa.openExternal === "function") {
+        oa.openExternal(url);
+        return;
+      }
+    } catch (e) {
+      console.error("[Just Cancel] openExternal failed:", e);
+    }
+
+    try {
+      window.location.href = url;
+    } catch (e) {
+      console.error("[Just Cancel] mailto navigation failed:", e);
+    }
+  };
+
   // Load saved data effect removed (now in initializer)
   // We still need to clear storage on forced reset if not already done
   useEffect(() => {
@@ -952,11 +971,8 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
       <div style={{ marginTop: 60, borderTop: `1px solid ${COLORS.border}`, paddingTop: 32, paddingBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
           <div style={{ display: "flex", gap: 24 }}>
-            <button onClick={() => window.location.href = "mailto:hello@justcancel.io"} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
+            <button onClick={openFeedback} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
               Feedback
-            </button>
-            <button onClick={() => window.open("https://github.com/jht243/just_cancel", "_blank")} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
-              Source Code
             </button>
             <button onClick={goHome} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
               Refresh Data

@@ -50993,6 +50993,23 @@ function JustCancel({ initialData: initialData2 }) {
     setShowManualInput(false);
     setProfile(DEFAULT_PROFILE);
   };
+  const openFeedback = () => {
+    const url = "mailto:hello@justcancel.io";
+    try {
+      const oa = window.openai;
+      if (oa && typeof oa.openExternal === "function") {
+        oa.openExternal(url);
+        return;
+      }
+    } catch (e) {
+      console.error("[Just Cancel] openExternal failed:", e);
+    }
+    try {
+      window.location.href = url;
+    } catch (e) {
+      console.error("[Just Cancel] mailto navigation failed:", e);
+    }
+  };
   (0, import_react3.useEffect)(() => {
     if (profile.analysisComplete === false && profile.manualSubscriptions.length === 0) {
       localStorage.removeItem(STORAGE_KEY);
@@ -51660,8 +51677,7 @@ function JustCancel({ initialData: initialData2 }) {
     ),
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { marginTop: 60, borderTop: `1px solid ${COLORS.border}`, paddingTop: 32, paddingBottom: 20 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }, children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 24 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => window.location.href = "mailto:hello@justcancel.io", style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Feedback" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => window.open("https://github.com/jht243/just_cancel", "_blank"), style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Source Code" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: openFeedback, style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Feedback" }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: goHome, style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Refresh Data" }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => alert("Donations coming soon!"), style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Donate" })
       ] }),
