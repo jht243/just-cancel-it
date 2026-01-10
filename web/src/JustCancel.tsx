@@ -105,57 +105,51 @@ const parseTextForSubscriptions = (text: string): SubscriptionItem[] => {
   const lines = text.split(/\r?\n/);
   const foundSubscriptions: Record<string, SubscriptionItem> = {};
 
-  // Heuristic: try to identify "amount" column
-  // This is simple; in production we'd do smarter header analysis
-
   lines.forEach((line, index) => {
-    // Skip very short lines
     if (line.length < 5) return;
-
-    // Normalize
     const lowerLine = line.toLowerCase();
 
-    // Check against patterns
     Object.values(SUBSCRIPTION_PATTERNS).forEach(pattern => {
       if (pattern.regex.test(lowerLine)) {
-        // Found a match! Now try to extract price
-        // Regex to look for currency-like numbers: $12.99 or 12.99
-        // We look for numbers that appear near the end or are isolated
-        const priceMatch = line.match(/(\d+\.\d{2})/);
+        // Extract price - look for currency patterns specifically
+        // Priority: $XX.XX format, then isolated decimals in reasonable range ($0.99 - $299.99)
         let cost = 0;
-        if (priceMatch) {
-          cost = parseFloat(priceMatch[0]);
+        
+        // First try: explicit currency format $XX.XX
+        const currencyMatch = line.match(/\$\s*(\d{1,3}(?:,\d{3})*\.\d{2})/); 
+        if (currencyMatch) {
+          cost = parseFloat(currencyMatch[1].replace(',', ''));
         } else {
-          // Fallback default costs if we can't parse (mock-ish but helpful)
-          if (pattern.name === "Netflix") cost = 15.49;
-          if (pattern.name === "Spotify") cost = 11.99;
-          if (pattern.name === "ChatGPT") cost = 20.00;
+          // Second try: decimal number that looks like a price (0.99 to 299.99 range)
+          const decimalMatches = line.match(/(\d{1,3}\.\d{2})(?!\d)/g) || [];
+          for (const match of decimalMatches) {
+            const val = parseFloat(match);
+            // Only accept reasonable subscription amounts ($0.99 - $299.99/month)
+            if (val >= 0.99 && val <= 299.99) {
+              cost = val;
+              break;
+            }
+          }
         }
 
-        const existing = foundSubscriptions[pattern.name];
+        // Skip if cost is unreasonably high (likely not a subscription price)
+        if (cost > 299.99) cost = 0;
 
+        const existing = foundSubscriptions[pattern.name];
         if (existing) {
-          // If already exists, increment count and update cost if this one is seemingly valid and previous wasn't
           existing.count = (existing.count || 1) + 1;
-          // Accumulate cost? Or just keep the max?
-          // Usually subs are monthly. If we see it 3 times, maybe it's 3 separate charges?
-          // User screenshot shows "x3", implies grouped.
-          // We'll keep the single unit cost but display x3.
+          // Only update cost if we found a valid one and existing has none
           if (existing.monthlyCost === 0 && cost > 0) existing.monthlyCost = cost;
-          // Keep the longest description found maybe?
-          if (line.length > (existing.originalDescription?.length || 0)) {
-            existing.originalDescription = line.trim();
-          }
         } else {
           foundSubscriptions[pattern.name] = {
             id: `sub-${Math.random().toString(36).substr(2, 9)}`,
             service: pattern.name,
-            monthlyCost: cost > 0 ? cost : 0,
-            status: "confirmed_subscription", // Default status - assume regex match is confirmed
+            monthlyCost: cost,
+            status: "confirmed_subscription",
             category: pattern.category,
             logo: pattern.logo,
             originalDescription: line.trim(),
-            cleanDescription: `${pattern.category} subscription`, // Generic description for now
+            cleanDescription: `${pattern.category} subscription`,
             count: 1
           };
         }
@@ -434,20 +428,20 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     setProfile(p => {
       const mergedMap: Record<string, SubscriptionItem> = {};
 
-      // Start with existing ones
+      // IMPORTANT: Deep copy existing subscriptions to preserve them exactly
+      // This ensures second PDF upload doesn't modify existing data
       p.manualSubscriptions.forEach(sub => {
-        mergedMap[sub.service.toLowerCase()] = sub;
+        mergedMap[sub.service.toLowerCase()] = { ...sub }; // Deep copy
       });
 
-      // Merge new ones
+      // Only ADD new subscriptions - never overwrite existing ones
       newSubscriptions.forEach(newSub => {
         const key = newSub.service.toLowerCase();
         if (!mergedMap[key]) {
+          // This is a genuinely new subscription
           mergedMap[key] = newSub;
-        } else {
-          // Keep existing but maybe update count if needed
-          // existingMap[key].count = (existingMap[key].count || 1) + 1;
         }
+        // If key exists, we intentionally do NOTHING - preserve existing data
       });
 
       const mergedList = Object.values(mergedMap);

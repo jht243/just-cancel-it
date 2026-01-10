@@ -50862,34 +50862,35 @@ var parseTextForSubscriptions = (text) => {
     const lowerLine = line.toLowerCase();
     Object.values(SUBSCRIPTION_PATTERNS).forEach((pattern) => {
       if (pattern.regex.test(lowerLine)) {
-        const priceMatch = line.match(/(\d+\.\d{2})/);
         let cost = 0;
-        if (priceMatch) {
-          cost = parseFloat(priceMatch[0]);
+        const currencyMatch = line.match(/\$\s*(\d{1,3}(?:,\d{3})*\.\d{2})/);
+        if (currencyMatch) {
+          cost = parseFloat(currencyMatch[1].replace(",", ""));
         } else {
-          if (pattern.name === "Netflix") cost = 15.49;
-          if (pattern.name === "Spotify") cost = 11.99;
-          if (pattern.name === "ChatGPT") cost = 20;
+          const decimalMatches = line.match(/(\d{1,3}\.\d{2})(?!\d)/g) || [];
+          for (const match of decimalMatches) {
+            const val = parseFloat(match);
+            if (val >= 0.99 && val <= 299.99) {
+              cost = val;
+              break;
+            }
+          }
         }
+        if (cost > 299.99) cost = 0;
         const existing = foundSubscriptions[pattern.name];
         if (existing) {
           existing.count = (existing.count || 1) + 1;
           if (existing.monthlyCost === 0 && cost > 0) existing.monthlyCost = cost;
-          if (line.length > (existing.originalDescription?.length || 0)) {
-            existing.originalDescription = line.trim();
-          }
         } else {
           foundSubscriptions[pattern.name] = {
             id: `sub-${Math.random().toString(36).substr(2, 9)}`,
             service: pattern.name,
-            monthlyCost: cost > 0 ? cost : 0,
+            monthlyCost: cost,
             status: "confirmed_subscription",
-            // Default status - assume regex match is confirmed
             category: pattern.category,
             logo: pattern.logo,
             originalDescription: line.trim(),
             cleanDescription: `${pattern.category} subscription`,
-            // Generic description for now
             count: 1
           };
         }
@@ -51121,13 +51122,12 @@ function JustCancel({ initialData: initialData2 }) {
     setProfile((p) => {
       const mergedMap = {};
       p.manualSubscriptions.forEach((sub) => {
-        mergedMap[sub.service.toLowerCase()] = sub;
+        mergedMap[sub.service.toLowerCase()] = { ...sub };
       });
       newSubscriptions.forEach((newSub) => {
         const key = newSub.service.toLowerCase();
         if (!mergedMap[key]) {
           mergedMap[key] = newSub;
-        } else {
         }
       });
       const mergedList = Object.values(mergedMap);
