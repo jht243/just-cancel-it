@@ -24557,8 +24557,20 @@ var __iconNode4 = [
 ];
 var FileText = createLucideIcon("file-text", __iconNode4);
 
-// node_modules/lucide-react/dist/esm/icons/house.js
+// node_modules/lucide-react/dist/esm/icons/heart.js
 var __iconNode5 = [
+  [
+    "path",
+    {
+      d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
+      key: "mvr1a0"
+    }
+  ]
+];
+var Heart = createLucideIcon("heart", __iconNode5);
+
+// node_modules/lucide-react/dist/esm/icons/house.js
+var __iconNode6 = [
   ["path", { d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8", key: "5wwlr5" }],
   [
     "path",
@@ -24568,10 +24580,22 @@ var __iconNode5 = [
     }
   ]
 ];
-var House = createLucideIcon("house", __iconNode5);
+var House = createLucideIcon("house", __iconNode6);
+
+// node_modules/lucide-react/dist/esm/icons/message-square.js
+var __iconNode7 = [
+  [
+    "path",
+    {
+      d: "M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z",
+      key: "18887p"
+    }
+  ]
+];
+var MessageSquare = createLucideIcon("message-square", __iconNode7);
 
 // node_modules/lucide-react/dist/esm/icons/pen-line.js
-var __iconNode6 = [
+var __iconNode8 = [
   ["path", { d: "M13 21h8", key: "1jsn5i" }],
   [
     "path",
@@ -24581,26 +24605,40 @@ var __iconNode6 = [
     }
   ]
 ];
-var PenLine = createLucideIcon("pen-line", __iconNode6);
+var PenLine = createLucideIcon("pen-line", __iconNode8);
 
 // node_modules/lucide-react/dist/esm/icons/plus.js
-var __iconNode7 = [
+var __iconNode9 = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "M12 5v14", key: "s699le" }]
 ];
-var Plus = createLucideIcon("plus", __iconNode7);
+var Plus = createLucideIcon("plus", __iconNode9);
+
+// node_modules/lucide-react/dist/esm/icons/printer.js
+var __iconNode10 = [
+  [
+    "path",
+    {
+      d: "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2",
+      key: "143wyd"
+    }
+  ],
+  ["path", { d: "M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6", key: "1itne7" }],
+  ["rect", { x: "6", y: "14", width: "12", height: "8", rx: "1", key: "1ue0tg" }]
+];
+var Printer = createLucideIcon("printer", __iconNode10);
 
 // node_modules/lucide-react/dist/esm/icons/refresh-cw.js
-var __iconNode8 = [
+var __iconNode11 = [
   ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
   ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
   ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
   ["path", { d: "M8 16H3v5", key: "1cv678" }]
 ];
-var RefreshCw = createLucideIcon("refresh-cw", __iconNode8);
+var RefreshCw = createLucideIcon("refresh-cw", __iconNode11);
 
 // node_modules/lucide-react/dist/esm/icons/shield.js
-var __iconNode9 = [
+var __iconNode12 = [
   [
     "path",
     {
@@ -24609,25 +24647,32 @@ var __iconNode9 = [
     }
   ]
 ];
-var Shield = createLucideIcon("shield", __iconNode9);
+var Shield = createLucideIcon("shield", __iconNode12);
 
 // node_modules/lucide-react/dist/esm/icons/trash-2.js
-var __iconNode10 = [
+var __iconNode13 = [
   ["path", { d: "M10 11v6", key: "nco0om" }],
   ["path", { d: "M14 11v6", key: "outv1u" }],
   ["path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6", key: "miytrc" }],
   ["path", { d: "M3 6h18", key: "d0wm0j" }],
   ["path", { d: "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", key: "e791ji" }]
 ];
-var Trash2 = createLucideIcon("trash-2", __iconNode10);
+var Trash2 = createLucideIcon("trash-2", __iconNode13);
 
 // node_modules/lucide-react/dist/esm/icons/upload.js
-var __iconNode11 = [
+var __iconNode14 = [
   ["path", { d: "M12 3v12", key: "1x0j5s" }],
   ["path", { d: "m17 8-5-5-5 5", key: "7q97r8" }],
   ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
 ];
-var Upload = createLucideIcon("upload", __iconNode11);
+var Upload = createLucideIcon("upload", __iconNode14);
+
+// node_modules/lucide-react/dist/esm/icons/x.js
+var __iconNode15 = [
+  ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+  ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+];
+var X = createLucideIcon("x", __iconNode15);
 
 // node_modules/pdfjs-dist/build/pdf.mjs
 var __webpack_require__ = {};
@@ -50982,6 +51027,9 @@ function JustCancel({ initialData: initialData2 }) {
   const [manualCategory, setManualCategory] = (0, import_react3.useState)("Other");
   const [dragActive, setDragActive] = (0, import_react3.useState)(false);
   const [analysisStep, setAnalysisStep] = (0, import_react3.useState)(ANALYSIS_STEPS[0]);
+  const [showFeedbackModal, setShowFeedbackModal] = (0, import_react3.useState)(false);
+  const [feedbackText, setFeedbackText] = (0, import_react3.useState)("");
+  const [feedbackStatus, setFeedbackStatus] = (0, import_react3.useState)("idle");
   const goHome = () => {
     console.log("[Just Cancel] Going home (reset to landing view)...");
     try {
@@ -50993,21 +51041,35 @@ function JustCancel({ initialData: initialData2 }) {
     setShowManualInput(false);
     setProfile(DEFAULT_PROFILE);
   };
-  const openFeedback = () => {
-    const url = "mailto:hello@justcancel.io";
+  const handleFeedbackSubmit = async () => {
+    if (!feedbackText.trim()) return;
+    setFeedbackStatus("submitting");
     try {
-      const oa = window.openai;
-      if (oa && typeof oa.openExternal === "function") {
-        oa.openExternal(url);
-        return;
+      const serverUrl = getServerUrl();
+      const response = await fetch(`${serverUrl}/api/track`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "user_feedback",
+          data: {
+            feedback: feedbackText,
+            source: "just-cancel"
+          }
+        })
+      });
+      if (response.ok) {
+        setFeedbackStatus("success");
+        setTimeout(() => {
+          setShowFeedbackModal(false);
+          setFeedbackText("");
+          setFeedbackStatus("idle");
+        }, 2e3);
+      } else {
+        setFeedbackStatus("error");
       }
     } catch (e) {
-      console.error("[Just Cancel] openExternal failed:", e);
-    }
-    try {
-      window.location.href = url;
-    } catch (e) {
-      console.error("[Just Cancel] mailto navigation failed:", e);
+      console.error("[Just Cancel] Feedback submission failed:", e);
+      setFeedbackStatus("error");
     }
   };
   (0, import_react3.useEffect)(() => {
@@ -51675,16 +51737,51 @@ function JustCancel({ initialData: initialData2 }) {
         ] })
       ] })
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { marginTop: 60, borderTop: `1px solid ${COLORS.border}`, paddingTop: 32, paddingBottom: 20 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 24 }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: openFeedback, style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Feedback" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: goHome, style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Refresh Data" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => alert("Donations coming soon!"), style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Donate" })
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { marginTop: 60, borderTop: `1px solid ${COLORS.border}`, paddingTop: 32, paddingBottom: 20 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => setShowFeedbackModal(true), style: { display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageSquare, { size: 16 }),
+        " Feedback"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { fontSize: 13, color: COLORS.textSecondary }, children: [
-        "\xA9 ",
-        (/* @__PURE__ */ new Date()).getFullYear(),
-        " Just Cancel. Local-first privacy."
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: goHome, style: { display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RefreshCw, { size: 16 }),
+        " Reset"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => alert("Donations coming soon!"), style: { display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, { size: 16 }),
+        " Donate"
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: () => window.print(), style: { display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Printer, { size: 16 }),
+        " Print"
+      ] })
+    ] }) }),
+    showFeedbackModal && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1e3 }, onClick: () => setShowFeedbackModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { backgroundColor: "white", borderRadius: 24, padding: 32, maxWidth: 400, width: "90%", position: "relative", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }, onClick: (e) => e.stopPropagation(), children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { style: { position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", color: COLORS.textSecondary }, onClick: () => setShowFeedbackModal(false), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { size: 24 }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 24, fontWeight: 800, marginBottom: 8, color: COLORS.textMain }, children: "Feedback" }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 24 }, children: "Help us improve Just Cancel." }),
+      feedbackStatus === "success" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { textAlign: "center", padding: 20, color: COLORS.primary, fontWeight: 600 }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 40, marginBottom: 10 }, children: "\u{1F389}" }),
+        "Thanks for your feedback!"
+      ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          "textarea",
+          {
+            style: { width: "100%", height: 120, padding: 12, borderRadius: 12, border: `1px solid ${COLORS.border}`, backgroundColor: COLORS.inputBg, fontSize: 14, resize: "none", fontFamily: "inherit", boxSizing: "border-box" },
+            placeholder: "Tell us what you think...",
+            value: feedbackText,
+            onChange: (e) => setFeedbackText(e.target.value)
+          }
+        ),
+        feedbackStatus === "error" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { color: COLORS.red, fontSize: 14, marginTop: 10 }, children: "Failed to send. Please try again." }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          "button",
+          {
+            style: { marginTop: 16, width: "100%", backgroundColor: COLORS.primary, color: "white", border: "none", padding: 14, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: "pointer" },
+            onClick: handleFeedbackSubmit,
+            disabled: feedbackStatus === "submitting" || !feedbackText.trim(),
+            children: feedbackStatus === "submitting" ? "Sending..." : "Send Feedback"
+          }
+        )
       ] })
     ] }) }),
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("style", { children: `
@@ -51925,7 +52022,23 @@ lucide-react/dist/esm/icons/file-text.js:
    * See the LICENSE file in the root directory of this source tree.
    *)
 
+lucide-react/dist/esm/icons/heart.js:
+  (**
+   * @license lucide-react v0.554.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+
 lucide-react/dist/esm/icons/house.js:
+  (**
+   * @license lucide-react v0.554.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+
+lucide-react/dist/esm/icons/message-square.js:
   (**
    * @license lucide-react v0.554.0 - ISC
    *
@@ -51942,6 +52055,14 @@ lucide-react/dist/esm/icons/pen-line.js:
    *)
 
 lucide-react/dist/esm/icons/plus.js:
+  (**
+   * @license lucide-react v0.554.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+
+lucide-react/dist/esm/icons/printer.js:
   (**
    * @license lucide-react v0.554.0 - ISC
    *
@@ -51974,6 +52095,14 @@ lucide-react/dist/esm/icons/trash-2.js:
    *)
 
 lucide-react/dist/esm/icons/upload.js:
+  (**
+   * @license lucide-react v0.554.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+
+lucide-react/dist/esm/icons/x.js:
   (**
    * @license lucide-react v0.554.0 - ISC
    *

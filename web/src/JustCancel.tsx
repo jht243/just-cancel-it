@@ -310,6 +310,11 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
   const [dragActive, setDragActive] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(ANALYSIS_STEPS[0]);
 
+  // Feedback Modal State
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackStatus, setFeedbackStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
   const goHome = () => {
     console.log("[Just Cancel] Going home (reset to landing view)...");
     try {
@@ -322,22 +327,37 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     setProfile(DEFAULT_PROFILE);
   };
 
-  const openFeedback = () => {
-    const url = "mailto:hello@justcancel.io";
+  const handleFeedbackSubmit = async () => {
+    if (!feedbackText.trim()) return;
+
+    setFeedbackStatus("submitting");
     try {
-      const oa = (window as any).openai;
-      if (oa && typeof oa.openExternal === "function") {
-        oa.openExternal(url);
-        return;
+      const serverUrl = getServerUrl();
+      const response = await fetch(`${serverUrl}/api/track`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "user_feedback",
+          data: {
+            feedback: feedbackText,
+            source: "just-cancel"
+          }
+        })
+      });
+
+      if (response.ok) {
+        setFeedbackStatus("success");
+        setTimeout(() => {
+          setShowFeedbackModal(false);
+          setFeedbackText("");
+          setFeedbackStatus("idle");
+        }, 2000);
+      } else {
+        setFeedbackStatus("error");
       }
     } catch (e) {
-      console.error("[Just Cancel] openExternal failed:", e);
-    }
-
-    try {
-      window.location.href = url;
-    } catch (e) {
-      console.error("[Just Cancel] mailto navigation failed:", e);
+      console.error("[Just Cancel] Feedback submission failed:", e);
+      setFeedbackStatus("error");
     }
   };
 
@@ -969,23 +989,61 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
 
       {/* Footer - Social & Actions */}
       <div style={{ marginTop: 60, borderTop: `1px solid ${COLORS.border}`, paddingTop: 32, paddingBottom: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
-          <div style={{ display: "flex", gap: 24 }}>
-            <button onClick={openFeedback} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
-              Feedback
-            </button>
-            <button onClick={goHome} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
-              Refresh Data
-            </button>
-            <button onClick={() => alert("Donations coming soon!")} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
-              Donate
-            </button>
-          </div>
-          <div style={{ fontSize: 13, color: COLORS.textSecondary }}>
-            &copy; {new Date().getFullYear()} Just Cancel. Local-first privacy.
-          </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
+          <button onClick={() => setShowFeedbackModal(true)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }}>
+            <MessageSquare size={16} /> Feedback
+          </button>
+          <button onClick={goHome} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }}>
+            <RefreshCw size={16} /> Reset
+          </button>
+          <button onClick={() => alert("Donations coming soon!")} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }}>
+            <Heart size={16} /> Donate
+          </button>
+          <button onClick={() => window.print()} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, fontWeight: 600, cursor: "pointer", padding: 8, transition: "color 0.2s" }}>
+            <Printer size={16} /> Print
+          </button>
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onClick={() => setShowFeedbackModal(false)}>
+          <div style={{ backgroundColor: "white", borderRadius: 24, padding: 32, maxWidth: 400, width: "90%", position: "relative", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }} onClick={e => e.stopPropagation()}>
+            <button style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", color: COLORS.textSecondary }} onClick={() => setShowFeedbackModal(false)}>
+              <X size={24} />
+            </button>
+            
+            <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, color: COLORS.textMain }}>Feedback</div>
+            <div style={{ fontSize: 14, color: COLORS.textSecondary, marginBottom: 24 }}>Help us improve Just Cancel.</div>
+
+            {feedbackStatus === "success" ? (
+              <div style={{ textAlign: "center", padding: 20, color: COLORS.primary, fontWeight: 600 }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>🎉</div>
+                Thanks for your feedback!
+              </div>
+            ) : (
+              <>
+                <textarea 
+                  style={{ width: "100%", height: 120, padding: 12, borderRadius: 12, border: `1px solid ${COLORS.border}`, backgroundColor: COLORS.inputBg, fontSize: 14, resize: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+                  placeholder="Tell us what you think..."
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                />
+                {feedbackStatus === "error" && (
+                  <div style={{ color: COLORS.red, fontSize: 14, marginTop: 10 }}>Failed to send. Please try again.</div>
+                )}
+                <button 
+                  style={{ marginTop: 16, width: "100%", backgroundColor: COLORS.primary, color: "white", border: "none", padding: 14, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: "pointer" }} 
+                  onClick={handleFeedbackSubmit}
+                  disabled={feedbackStatus === "submitting" || !feedbackText.trim()}
+                >
+                  {feedbackStatus === "submitting" ? "Sending..." : "Send Feedback"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
