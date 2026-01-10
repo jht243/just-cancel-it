@@ -590,8 +590,11 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
             <DollarSign size={24} />
           </div>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.5px" }}>Just Cancel</h1>
-            <p style={{ fontSize: 13, color: COLORS.textSecondary, margin: 0 }}>Find and cancel unwanted subscriptions</p>
+            <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.5px" }}>The Subscription Detective</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+              <Check size={14} style={{ color: COLORS.primary }} />
+              <p style={{ fontSize: 13, color: COLORS.textSecondary, margin: 0 }}>Powered by AI pattern recognition</p>
+            </div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
