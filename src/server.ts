@@ -1771,9 +1771,18 @@ const httpServer = createServer(
 
     const url = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
 
+    const acceptHeader = typeof req.headers.accept === "string" ? req.headers.accept : "";
+    const isMcpRootSse = url.pathname === "/" && acceptHeader.includes("text/event-stream");
+
     if (
       req.method === "OPTIONS" &&
-      (url.pathname === ssePath || url.pathname === postPath)
+      (
+        url.pathname === ssePath ||
+        url.pathname === `${ssePath}/` ||
+        url.pathname === postPath ||
+        url.pathname === `${postPath}/` ||
+        url.pathname === "/"
+      )
     ) {
       res.writeHead(204, {
         "Access-Control-Allow-Origin": "*",
@@ -1796,12 +1805,49 @@ const httpServer = createServer(
       return;
     }
 
-    if (req.method === "GET" && url.pathname === ssePath) {
+    if (
+      (req.method === "GET" || req.method === "HEAD") &&
+      (url.pathname === ssePath || url.pathname === `${ssePath}/` || isMcpRootSse)
+    ) {
+      if (req.method === "HEAD") {
+        res.writeHead(200, {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+          "Access-Control-Allow-Origin": "*",
+        });
+        res.end();
+        return;
+      }
+
       await handleSseRequest(res);
       return;
     }
 
-    if (req.method === "POST" && url.pathname === postPath) {
+    if ((url.pathname === postPath || url.pathname === `${postPath}/`) && req.method === "GET") {
+      res.writeHead(405, {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "content-type",
+      });
+      res.end("Method not allowed");
+      return;
+    }
+
+    if (
+      (req.method === "POST" || req.method === "HEAD") &&
+      (url.pathname === postPath || url.pathname === `${postPath}/`)
+    ) {
+      if (req.method === "HEAD") {
+        res.writeHead(200, {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "content-type",
+        });
+        res.end();
+        return;
+      }
+
       await handlePostMessage(req, res, url);
       return;
     }
