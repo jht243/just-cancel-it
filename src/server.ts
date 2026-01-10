@@ -1831,6 +1831,12 @@ const httpServer = createServer(
       return;
     }
 
+    if (url.pathname === "/.well-known/openai-apps-challenge") {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end("vRC_ZwCcv_vY9u3Ovq9vgvxwG19KTHrBIwMH43O6c98");
+      return;
+    }
+
     // Serve alias for legacy loader path -> our main widget HTML
     if (req.method === "GET" && url.pathname === "/assets/just-cancel.html") {
       const mainAssetPath = path.join(ASSETS_DIR, "just-cancel.html");
