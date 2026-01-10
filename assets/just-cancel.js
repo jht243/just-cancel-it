@@ -51239,10 +51239,10 @@ function JustCancel({ initialData: initialData2 }) {
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 12 }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: 40, height: 40, borderRadius: 10, backgroundColor: COLORS.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { size: 24 }) }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { style: { fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.5px" }, children: "The Subscription Killer" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { style: { fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: "-0.5px" }, children: "The Subscription Remover" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 6, marginTop: 4 }, children: [
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, { size: 14, style: { color: COLORS.primary } }),
-            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 13, color: COLORS.textSecondary, margin: 0 }, children: "Powered by AI pattern recognition" })
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 13, color: COLORS.textSecondary, margin: 0 }, children: "Powered by AI pattern recognition to save you thousands per year" })
           ] })
         ] })
       ] }),
