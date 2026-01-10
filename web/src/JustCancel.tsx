@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
-  RotateCcw, ChevronDown, ChevronUp, X, Mail, MessageSquare, Heart, Printer, Check, Info,
+  ChevronDown, ChevronUp, X, Mail, MessageSquare, Heart, Printer, Check, Info,
   Plane, MapPin, Calendar, Users, Sun, Cloud, Snowflake, Umbrella, Baby, Dog, Cat, Plus,
   CheckCircle2, Circle, Luggage, Shirt, Droplets, Shield, Smartphone, Activity, Home, FileText,
   Mountain, Waves, Tent, Package, Star, PenLine, Search, Upload, DollarSign, CreditCard, Trash2, ExternalLink, ArrowRight, AlertCircle, RefreshCw
@@ -191,11 +191,14 @@ const extractTextFromPDF = async (fileData: ArrayBuffer): Promise<{ text: string
     try {
       const serverUrl = getServerUrl();
       const base64 = btoa(new Uint8Array(fileData).reduce((data, byte) => data + String.fromCharCode(byte), ""));
+      console.log("[Just Cancel] Attempting server-side PDF extraction", { serverUrl });
       const response = await fetch(`${serverUrl}/api/extract-pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64 })
       });
+
+      console.log("[Just Cancel] /api/extract-pdf response", { ok: response.ok, status: response.status, statusText: response.statusText });
 
       const result = await response.json();
       if (result.text) {
@@ -306,6 +309,18 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
   const [manualCategory, setManualCategory] = useState("Other");
   const [dragActive, setDragActive] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(ANALYSIS_STEPS[0]);
+
+  const goHome = () => {
+    console.log("[Just Cancel] Going home (reset to landing view)...");
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("JUST_CANCEL_DATA");
+    } catch (e) {
+      console.error("[Just Cancel] Failed to clear storage during goHome:", e);
+    }
+    setShowManualInput(false);
+    setProfile(DEFAULT_PROFILE);
+  };
 
   // Load saved data effect removed (now in initializer)
   // We still need to clear storage on forced reset if not already done
@@ -489,24 +504,6 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
     return validSubs.filter(s => s.status === profile.viewFilter);
   };
 
-  const resetAnalysis = () => {
-    console.log("[Just Cancel] Resetting all data...");
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem("JUST_CANCEL_DATA"); // Be thorough
-      sessionStorage.setItem("JUST_CANCEL_FORCE_RESET", "true");
-      window.location.reload();
-    } catch (e) {
-      console.error("[Just Cancel] Reset failed:", e);
-      setProfile({
-        ...DEFAULT_PROFILE,
-        analysisComplete: false,
-        manualSubscriptions: [],
-        totalMonthlySpend: 0
-      });
-    }
-  };
-
   // Sub-components for identifying status counts
   const statusCounts = useMemo(() => {
     const subs = profile.manualSubscriptions;
@@ -568,11 +565,11 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
             </button>
           )}
           {(profile.analysisComplete || profile.manualSubscriptions.length > 0) && (
-            <button onClick={resetAnalysis} style={{
-              display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: 8,
-              backgroundColor: COLORS.inputBg, color: COLORS.textSecondary, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 500
+            <button onClick={goHome} aria-label="Home" title="Home" style={{
+              display: "flex", alignItems: "center", justifyContent: "center", padding: "8px 12px", borderRadius: 8,
+              backgroundColor: COLORS.inputBg, color: COLORS.textSecondary, border: "none", cursor: "pointer"
             }}>
-              <RotateCcw size={14} /> Start Over
+              <Home size={16} />
             </button>
           )}
         </div>
@@ -961,7 +958,7 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
             <button onClick={() => window.open("https://github.com/jht243/just_cancel", "_blank")} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
               Source Code
             </button>
-            <button onClick={resetAnalysis} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
+            <button onClick={goHome} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>
               Refresh Data
             </button>
             <button onClick={() => alert("Donations coming soon!")} style={{ background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }}>

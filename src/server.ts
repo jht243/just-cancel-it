@@ -1632,33 +1632,72 @@ async function handleHeartbeat(res: ServerResponse) {
 }
 
 async function handleExtractPdf(req: IncomingMessage, res: ServerResponse) {
-  let body = "";
-  req.on("data", (chunk) => (body += chunk));
-  req.on("end", async () => {
-    try {
-      const { base64 } = JSON.parse(body);
-      if (!base64) throw new Error("Missing base64 data");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "content-type");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Content-Type", "application/json");
 
-      const buffer = Buffer.from(base64, "base64");
-      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
-      const pdf = await loadingTask.promise;
-      let fullText = "";
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => item.str).join(" ");
-        fullText += pageText + "\n";
-      }
-
-      res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
-      res.end(JSON.stringify({ text: fullText }));
-    } catch (error: any) {
-      console.error("Server-side PDF extraction failed:", error);
-      res.writeHead(500, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
-      res.end(JSON.stringify({ error: error.message || "Extraction failed" }));
-    }
+  console.log("[Extract PDF] Incoming request", {
+    method: req.method,
+    origin: req.headers.origin,
+    userAgent: req.headers["user-agent"],
+    contentType: req.headers["content-type"],
+    contentLength: req.headers["content-length"],
   });
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204).end();
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.writeHead(405).end(JSON.stringify({ error: "Method not allowed" }));
+    return;
+  }
+
+  try {
+    let body = "";
+    for await (const chunk of req) {
+      body += chunk;
+    }
+
+    console.log("[Extract PDF] Body received", { length: body.length });
+
+    const parsedBody = JSON.parse(body);
+    const base64 = parsedBody?.base64;
+    if (!base64 || typeof base64 !== "string") {
+      throw new Error("Missing base64 data");
+    }
+
+    const buffer = Buffer.from(base64, "base64");
+    console.log("[Extract PDF] Decoded buffer", { bytes: buffer.length });
+
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
+    const pdf = await loadingTask.promise;
+    console.log("[Extract PDF] PDF loaded", { pages: pdf.numPages });
+
+    let fullText = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(" ");
+      console.log("[Extract PDF] Page extracted", { page: i, chars: pageText.length });
+      fullText += pageText + "\n";
+    }
+
+    console.log("[Extract PDF] Extraction complete", { totalChars: fullText.length });
+    res.writeHead(200).end(JSON.stringify({ text: fullText }));
+  } catch (error: any) {
+    console.error("[Extract PDF] Server-side PDF extraction failed", {
+      message: error?.message,
+      stack: error?.stack,
+    });
+    res.writeHead(500).end(
+      JSON.stringify({
+        error: error?.message || "Extraction failed",
+      })
+    );
+  }
 }
 
 async function handleSseRequest(res: ServerResponse) {
@@ -1782,7 +1821,7 @@ const httpServer = createServer(
       return;
     }
 
-    if (url.pathname === "/api/extract-pdf" && req.method === "POST") {
+    if (url.pathname === "/api/extract-pdf" && (req.method === "POST" || req.method === "OPTIONS")) {
       await handleExtractPdf(req, res);
       return;
     }

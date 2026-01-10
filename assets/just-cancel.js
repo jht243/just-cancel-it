@@ -24557,8 +24557,21 @@ var __iconNode4 = [
 ];
 var FileText = createLucideIcon("file-text", __iconNode4);
 
-// node_modules/lucide-react/dist/esm/icons/pen-line.js
+// node_modules/lucide-react/dist/esm/icons/house.js
 var __iconNode5 = [
+  ["path", { d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8", key: "5wwlr5" }],
+  [
+    "path",
+    {
+      d: "M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+      key: "r6nss1"
+    }
+  ]
+];
+var House = createLucideIcon("house", __iconNode5);
+
+// node_modules/lucide-react/dist/esm/icons/pen-line.js
+var __iconNode6 = [
   ["path", { d: "M13 21h8", key: "1jsn5i" }],
   [
     "path",
@@ -24568,30 +24581,23 @@ var __iconNode5 = [
     }
   ]
 ];
-var PenLine = createLucideIcon("pen-line", __iconNode5);
+var PenLine = createLucideIcon("pen-line", __iconNode6);
 
 // node_modules/lucide-react/dist/esm/icons/plus.js
-var __iconNode6 = [
+var __iconNode7 = [
   ["path", { d: "M5 12h14", key: "1ays0h" }],
   ["path", { d: "M12 5v14", key: "s699le" }]
 ];
-var Plus = createLucideIcon("plus", __iconNode6);
+var Plus = createLucideIcon("plus", __iconNode7);
 
 // node_modules/lucide-react/dist/esm/icons/refresh-cw.js
-var __iconNode7 = [
+var __iconNode8 = [
   ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
   ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
   ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
   ["path", { d: "M8 16H3v5", key: "1cv678" }]
 ];
-var RefreshCw = createLucideIcon("refresh-cw", __iconNode7);
-
-// node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
-var __iconNode8 = [
-  ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
-  ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
-];
-var RotateCcw = createLucideIcon("rotate-ccw", __iconNode8);
+var RefreshCw = createLucideIcon("refresh-cw", __iconNode8);
 
 // node_modules/lucide-react/dist/esm/icons/shield.js
 var __iconNode9 = [
@@ -50867,11 +50873,13 @@ var extractTextFromPDF = async (fileData) => {
     try {
       const serverUrl = getServerUrl();
       const base64 = btoa(new Uint8Array(fileData).reduce((data, byte) => data + String.fromCharCode(byte), ""));
+      console.log("[Just Cancel] Attempting server-side PDF extraction", { serverUrl });
       const response = await fetch(`${serverUrl}/api/extract-pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64 })
       });
+      console.log("[Just Cancel] /api/extract-pdf response", { ok: response.ok, status: response.status, statusText: response.statusText });
       const result = await response.json();
       if (result.text) {
         console.log("[Just Cancel] Server-side extraction successful.");
@@ -50974,6 +50982,17 @@ function JustCancel({ initialData: initialData2 }) {
   const [manualCategory, setManualCategory] = (0, import_react3.useState)("Other");
   const [dragActive, setDragActive] = (0, import_react3.useState)(false);
   const [analysisStep, setAnalysisStep] = (0, import_react3.useState)(ANALYSIS_STEPS[0]);
+  const goHome = () => {
+    console.log("[Just Cancel] Going home (reset to landing view)...");
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("JUST_CANCEL_DATA");
+    } catch (e) {
+      console.error("[Just Cancel] Failed to clear storage during goHome:", e);
+    }
+    setShowManualInput(false);
+    setProfile(DEFAULT_PROFILE);
+  };
   (0, import_react3.useEffect)(() => {
     if (profile.analysisComplete === false && profile.manualSubscriptions.length === 0) {
       localStorage.removeItem(STORAGE_KEY);
@@ -51112,23 +51131,6 @@ function JustCancel({ initialData: initialData2 }) {
     }
     return validSubs.filter((s) => s.status === profile.viewFilter);
   };
-  const resetAnalysis = () => {
-    console.log("[Just Cancel] Resetting all data...");
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem("JUST_CANCEL_DATA");
-      sessionStorage.setItem("JUST_CANCEL_FORCE_RESET", "true");
-      window.location.reload();
-    } catch (e) {
-      console.error("[Just Cancel] Reset failed:", e);
-      setProfile({
-        ...DEFAULT_PROFILE,
-        analysisComplete: false,
-        manualSubscriptions: [],
-        totalMonthlySpend: 0
-      });
-    }
-  };
   const statusCounts = (0, import_react3.useMemo)(() => {
     const subs = profile.manualSubscriptions;
     return {
@@ -51179,22 +51181,17 @@ function JustCancel({ initialData: initialData2 }) {
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { size: 14, style: { transform: "rotate(180deg)" } }),
           " Back to Dashboard"
         ] }),
-        (profile.analysisComplete || profile.manualSubscriptions.length > 0) && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { onClick: resetAnalysis, style: {
+        (profile.analysisComplete || profile.manualSubscriptions.length > 0) && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: goHome, "aria-label": "Home", title: "Home", style: {
           display: "flex",
           alignItems: "center",
-          gap: 6,
+          justifyContent: "center",
           padding: "8px 12px",
           borderRadius: 8,
           backgroundColor: COLORS.inputBg,
           color: COLORS.textSecondary,
           border: "none",
-          cursor: "pointer",
-          fontSize: 13,
-          fontWeight: 500
-        }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RotateCcw, { size: 14 }),
-          " Start Over"
-        ] })
+          cursor: "pointer"
+        }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(House, { size: 16 }) })
       ] })
     ] }),
     !profile.analysisComplete ? (
@@ -51665,7 +51662,7 @@ function JustCancel({ initialData: initialData2 }) {
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 24 }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => window.location.href = "mailto:hello@justcancel.io", style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Feedback" }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => window.open("https://github.com/jht243/just_cancel", "_blank"), style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Source Code" }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: resetAnalysis, style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Refresh Data" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: goHome, style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Refresh Data" }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => alert("Donations coming soon!"), style: { background: "none", border: "none", color: COLORS.textSecondary, fontSize: 14, cursor: "pointer", padding: 0 }, children: "Donate" })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { fontSize: 13, color: COLORS.textSecondary }, children: [
@@ -51912,6 +51909,14 @@ lucide-react/dist/esm/icons/file-text.js:
    * See the LICENSE file in the root directory of this source tree.
    *)
 
+lucide-react/dist/esm/icons/house.js:
+  (**
+   * @license lucide-react v0.554.0 - ISC
+   *
+   * This source code is licensed under the ISC license.
+   * See the LICENSE file in the root directory of this source tree.
+   *)
+
 lucide-react/dist/esm/icons/pen-line.js:
   (**
    * @license lucide-react v0.554.0 - ISC
@@ -51929,14 +51934,6 @@ lucide-react/dist/esm/icons/plus.js:
    *)
 
 lucide-react/dist/esm/icons/refresh-cw.js:
-  (**
-   * @license lucide-react v0.554.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
-lucide-react/dist/esm/icons/rotate-ccw.js:
   (**
    * @license lucide-react v0.554.0 - ISC
    *
