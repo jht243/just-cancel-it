@@ -51234,8 +51234,8 @@ function JustCancel({ initialData: initialData2 }) {
         ` })
     ] });
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { width: "100%", maxWidth: 800, margin: "0 auto", padding: "20px", boxSizing: "border-box", fontFamily: '"Inter", sans-serif', color: COLORS.textMain }, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }, children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { width: "100%", maxWidth: 800, margin: "0 auto", padding: "14px", boxSizing: "border-box", fontFamily: '"Inter", sans-serif', color: COLORS.textMain }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }, children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 12 }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: 40, height: 40, borderRadius: 10, backgroundColor: COLORS.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DollarSign, { size: 24 }) }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
@@ -51280,14 +51280,14 @@ function JustCancel({ initialData: initialData2 }) {
       // Landing View - Upload or Manual Entry
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { animation: "fadeIn 0.5s ease-out" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
         backgroundColor: "white",
-        borderRadius: 24,
-        padding: 40,
+        borderRadius: 20,
+        padding: 28,
         border: `1px solid ${COLORS.border}`,
         boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
         textAlign: "center"
       }, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { style: { fontSize: 28, fontWeight: 800, marginBottom: 12 }, children: "Stop paying for what you don't use." }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 16, color: COLORS.textSecondary, marginBottom: 32, lineHeight: 1.5, maxWidth: 500, margin: "0 auto 32px" }, children: "Upload your bank statement (PDF or CSV) to instantly identify recurring subscriptions, or enter them manually to track your savings." }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { style: { fontSize: 24, fontWeight: 800, marginBottom: 8 }, children: "Stop paying for what you don't use." }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 15, color: COLORS.textSecondary, marginBottom: 24, lineHeight: 1.4, maxWidth: 480, margin: "0 auto 24px" }, children: "Upload your bank statement (PDF or CSV) to instantly identify recurring subscriptions, or enter them manually to track your savings." }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
           "div",
           {
@@ -51298,8 +51298,8 @@ function JustCancel({ initialData: initialData2 }) {
             style: {
               border: `2px dashed ${dragActive ? COLORS.primary : COLORS.border}`,
               backgroundColor: dragActive ? COLORS.accentLight : COLORS.inputBg,
-              borderRadius: 16,
-              padding: "40px 20px",
+              borderRadius: 14,
+              padding: "28px 16px",
               cursor: "pointer",
               transition: "all 0.2s",
               position: "relative",
@@ -51316,13 +51316,13 @@ function JustCancel({ initialData: initialData2 }) {
                   style: { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: 64, height: 64, margin: "0 auto 16px", borderRadius: "50%", backgroundColor: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { size: 32, color: COLORS.primary }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontWeight: 600, fontSize: 16, marginBottom: 4 }, children: "Click to upload or drag & drop" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width: 56, height: 56, margin: "0 auto 12px", borderRadius: "50%", backgroundColor: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Upload, { size: 28, color: COLORS.primary }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontWeight: 600, fontSize: 15, marginBottom: 4 }, children: "Click to upload or drag & drop" }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 13, color: COLORS.textSecondary }, children: "Bank statements (PDF) or CSV exports supported" })
             ]
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 16, margin: "32px 0" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 16, margin: "24px 0" }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { height: 1, backgroundColor: COLORS.border, flex: 1 } }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: 13, color: COLORS.textSecondary, fontWeight: 600 }, children: "OR" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { height: 1, backgroundColor: COLORS.border, flex: 1 } })
@@ -51359,9 +51359,9 @@ function JustCancel({ initialData: initialData2 }) {
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Shield, { size: 12 }),
           " Your data is processed locally and never leaves your device."
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: 40, textAlign: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { fontSize: 18, fontWeight: 700, marginBottom: 20 }, children: "Join thousands saving money every day" }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }, children: WALL_OF_SAVINGS_DATA.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: 32, textAlign: "center" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { fontSize: 16, fontWeight: 700, marginBottom: 16 }, children: "Join thousands saving money every day" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }, children: WALL_OF_SAVINGS_DATA.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
             backgroundColor: "white",
             padding: 16,
             borderRadius: 16,

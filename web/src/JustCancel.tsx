@@ -582,9 +582,9 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
   }
 
   return (
-    <div style={{ width: "100%", maxWidth: 800, margin: "0 auto", padding: "20px", boxSizing: "border-box", fontFamily: '"Inter", sans-serif', color: COLORS.textMain }}>
+    <div style={{ width: "100%", maxWidth: 800, margin: "0 auto", padding: "14px", boxSizing: "border-box", fontFamily: '"Inter", sans-serif', color: COLORS.textMain }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: COLORS.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
             <DollarSign size={24} />
@@ -621,11 +621,11 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
         // Landing View - Upload or Manual Entry
         <div style={{ animation: "fadeIn 0.5s ease-out" }}>
           <div style={{
-            backgroundColor: "white", borderRadius: 24, padding: 40, border: `1px solid ${COLORS.border}`,
+            backgroundColor: "white", borderRadius: 20, padding: 28, border: `1px solid ${COLORS.border}`,
             boxShadow: "0 4px 12px rgba(0,0,0,0.03)", textAlign: "center"
           }}>
-            <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>Stop paying for what you don't use.</h2>
-            <p style={{ fontSize: 16, color: COLORS.textSecondary, marginBottom: 32, lineHeight: 1.5, maxWidth: 500, margin: "0 auto 32px" }}>
+            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Stop paying for what you don't use.</h2>
+            <p style={{ fontSize: 15, color: COLORS.textSecondary, marginBottom: 24, lineHeight: 1.4, maxWidth: 480, margin: "0 auto 24px" }}>
               Upload your bank statement (PDF or CSV) to instantly identify recurring subscriptions, or enter them manually to track your savings.
             </p>
 
@@ -635,7 +635,7 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
               style={{
                 border: `2px dashed ${dragActive ? COLORS.primary : COLORS.border}`,
                 backgroundColor: dragActive ? COLORS.accentLight : COLORS.inputBg,
-                borderRadius: 16, padding: "40px 20px", cursor: "pointer", transition: "all 0.2s",
+                borderRadius: 14, padding: "28px 16px", cursor: "pointer", transition: "all 0.2s",
                 position: "relative", overflow: "hidden"
               }}
             >
@@ -643,14 +643,14 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
                 type="file" multiple={false} onChange={handleFileChange} accept=".csv,.pdf"
                 style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }}
               />
-              <div style={{ width: 64, height: 64, margin: "0 auto 16px", borderRadius: "50%", backgroundColor: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-                <Upload size={32} color={COLORS.primary} />
+              <div style={{ width: 56, height: 56, margin: "0 auto 12px", borderRadius: "50%", backgroundColor: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                <Upload size={28} color={COLORS.primary} />
               </div>
-              <p style={{ fontWeight: 600, fontSize: 16, marginBottom: 4 }}>Click to upload or drag & drop</p>
+              <p style={{ fontWeight: 600, fontSize: 15, marginBottom: 4 }}>Click to upload or drag & drop</p>
               <p style={{ fontSize: 13, color: COLORS.textSecondary }}>Bank statements (PDF) or CSV exports supported</p>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "32px 0" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "24px 0" }}>
               <div style={{ height: 1, backgroundColor: COLORS.border, flex: 1 }}></div>
               <span style={{ fontSize: 13, color: COLORS.textSecondary, fontWeight: 600 }}>OR</span>
               <div style={{ height: 1, backgroundColor: COLORS.border, flex: 1 }}></div>
@@ -671,9 +671,9 @@ export default function JustCancel({ initialData }: { initialData?: any }) {
             </p>
 
             {/* Wall of Savings - Social Proof */}
-            <div style={{ marginTop: 40, textAlign: "center" }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Join thousands saving money every day</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ marginTop: 32, textAlign: "center" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Join thousands saving money every day</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {WALL_OF_SAVINGS_DATA.map(item => (
                   <div key={item.id} style={{
                     backgroundColor: "white", padding: 16, borderRadius: 16, border: `1px solid ${COLORS.border}`,
